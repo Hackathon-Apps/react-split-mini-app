@@ -91,7 +91,7 @@ function App() {
       default:
         return <SplitBill hideCta={isEditing} />;
     }
-  }, [tab]);
+  }, [tab, isEditing]);
 
   return (
     <StyledApp>

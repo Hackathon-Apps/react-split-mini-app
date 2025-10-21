@@ -163,7 +163,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
   const [total, setTotal] = useState("");
   const [yours, setYours] = useState("");
   const [receiver, setReceiver] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
 
   const onScan = useCallback(() => {
     // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -223,8 +222,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
             placeholder="Total amount"
             value={total}
             onChange={(e) => setTotal(e.target.value)}
-            onFocus={() => setIsEditing(true)}
-            onBlur={() => setTimeout(() => setIsEditing(false), 50)}
             min={0}
             step="0.01"
           />
@@ -244,8 +241,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
             placeholder={`Your part`}
             value={yours}
             onChange={(e) => setYours(e.target.value)}
-            onFocus={() => setIsEditing(true)}
-            onBlur={() => setTimeout(() => setIsEditing(false), 50)}
             min={minPart}
             step="0.01"
           />
@@ -263,8 +258,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
             placeholder="TON address"
             value={receiver}
             onChange={(e) => setReceiver(e.target.value)}
-            onFocus={() => setIsEditing(true)}
-            onBlur={() => setTimeout(() => setIsEditing(false), 50)}
           />
           <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
           <ScanButton type="button" onClick={onScan} aria-label="Scan">
@@ -276,7 +269,7 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
 
       <Footer />
 
-      <FixedCtaWrap hidden={hideCta || isEditing} aria-hidden={(hideCta || isEditing) ? true : undefined}>
+      <FixedCtaWrap hidden={hideCta} aria-hidden={hideCta ? true : undefined}>
         <FixedCtaInner>
           <PrimaryAction disabled={!receiver || !total || !yours || totalInvalid || yoursInvalid || receiverInvalid}>
             Create
