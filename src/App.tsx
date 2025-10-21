@@ -16,9 +16,9 @@ const StyledApp = styled.div`
     background-color: #222;
     color: white;
   }
-  min-height: 100vh;
-  /* extra bottom padding so content doesn't hide behind fixed tab bar */
-  padding: 20px 20px calc(120px + env(safe-area-inset-bottom));
+  min-height: 100svh;
+  /* keep space for bottom tab bar only */
+  padding: 16px 16px calc(88px + env(safe-area-inset-bottom));
 `;
 
 const AppContainer = styled.div`
@@ -31,7 +31,8 @@ const HeaderRow = styled.div`
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin: 16px 0 65px;
+  /* tighten spacing so Connect button remains visible without scroll */
+  margin: 12px 0 24px;
 `;
 
 function App() {

@@ -10,7 +10,8 @@ const Screen = styled.div`
   gap: 18px;
   max-width: 900px;
   margin: 0 auto;
-  min-height: calc(100vh - 180px);
+  /* align with app container using small viewport height to avoid scroll */
+  min-height: calc(90svh - 160px);
 `;
 
 const Field = styled.fieldset<{ invalid?: boolean }>`
@@ -50,6 +51,17 @@ const Input = styled.input`
   color: inherit;
   outline: none;
   font-size: 14px;
+
+  /* Hide number input spinners on all browsers */
+  &[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield;
+  }
+  &[type="number"]::-webkit-outer-spin-button,
+  &[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    margin: 0;
+  }
 
   &::placeholder {
     color: #888;
@@ -110,14 +122,14 @@ const ErrorText = styled.small`
 `;
 
 const Footer = styled.div`
-  height: 140px; /* space to keep content clear of the floating CTA */
+  height: 96px; /* reduced to avoid extra scroll while keeping CTA clear */
 `;
 
 const FixedCtaWrap = styled.div`
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(var(--bottom-bar-height, 88px) + 40px + env(safe-area-inset-bottom));
+  bottom: calc(var(--bottom-bar-height, 88px) + 24px + env(safe-area-inset-bottom));
   display: flex;
   justify-content: center;
   padding: 0 16px;
