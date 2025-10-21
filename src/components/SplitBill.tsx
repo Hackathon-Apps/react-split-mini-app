@@ -1,0 +1,267 @@
+import { useCallback, useState } from "react";
+import styled from "styled-components";
+import { Address } from "ton";
+import { Button } from "./styled/styled";
+import WebApp from "@twa-dev/sdk";
+
+const Screen = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: calc(100vh - 180px);
+`;
+
+const Field = styled.fieldset<{ invalid?: boolean }>`
+  margin: 0;
+  padding: 6px 12px 10px;
+  border-radius: 20px;
+  border: 1px solid ${(p) => (p.invalid ? "#ff4d4f" : "#c2c2c2")};
+  background: transparent;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: ${(p) => (p.invalid ? "#ff6b6b" : "#3a3a3a")};
+  }
+`;
+
+const Legend = styled.legend`
+  padding: 0 6px;
+  opacity: 0.9;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: var(--fontRoboto);
+  line-height: 1;
+  margin-left: 4px;
+  margin-bottom: -4px; /* tighten gap to input */
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const Input = styled.input`
+  flex: 1;
+  padding: 10px 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  font-size: 14px;
+
+  &::placeholder {
+    color: #888;
+    opacity: 1;
+    font-family: var(--fontRoboto);
+    font-weight: 600;
+    font-size: 15px;
+  }
+`;
+
+const TrailingIconButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+  border: 1px solid #c2c2c2;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: #3a3a3a;
+  }
+`;
+
+const TonBadge = styled.div`
+  width: 29px;
+  height: 29px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PasteButton = styled.button`
+  border: 0;
+  background: transparent;
+  color: #2990FF;
+  font-weight: 600;
+  font-family: var(--fontSF);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 6px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+`;
+
+const ScanButton = styled(TrailingIconButton)`
+  border-color: #2990FF;
+  color: #2990FF;
+`;
+
+const ErrorText = styled.small`
+  color: #ff4d4f;
+  padding-left: 6px;
+`;
+
+const Footer = styled.div`
+  height: 140px; /* space to keep content clear of the floating CTA */
+`;
+
+const FixedCtaWrap = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bottom-bar-height, 88px) + 40px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 900; /* below tab bar (1000), above content */
+`;
+
+const FixedCtaInner = styled.div`
+  width: min(900px, 92%);
+`;
+
+const PrimaryAction = styled(Button)`
+  width: 100%;
+  border-radius: 16px;
+  padding: 14px 20px;
+  font-size: 16px;
+  background-color: #2990FF !important;
+  color: #FFFFFF !important;
+  font-family: var(--fontSF) !important;
+  font-weight: 600 !important;
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+`;
+
+export function SplitBill() {
+  const [total, setTotal] = useState("");
+  const [yours, setYours] = useState("");
+  const [receiver, setReceiver] = useState("");
+
+  const onScan = useCallback(() => {
+    // Telegram WebApp QR scanner. Fallback: prompt paste
+    try {
+      WebApp.showScanQrPopup({ text: "Scan TON address" }, (data) => {
+        if (data) {
+          setReceiver(data);
+          WebApp.closeScanQrPopup();
+        }
+      });
+    } catch (e) {
+      const pasted = window.prompt("Paste TON address");
+      if (pasted) setReceiver(pasted);
+    }
+  }, []);
+
+  const onPaste = useCallback(async () => {
+    try {
+      const anyWebApp: any = WebApp as any;
+      if (anyWebApp?.readTextFromClipboard) {
+        const text = await anyWebApp.readTextFromClipboard();
+        if (text) return setReceiver(String(text).trim());
+      }
+    } catch {}
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) return setReceiver(String(text).trim());
+    } catch {}
+    const fallback = window.prompt("Paste TON address");
+    if (fallback) setReceiver(fallback.trim());
+  }, []);
+
+  const minPart = 0.1;
+  const isValidAmount = (v: string) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > minPart;
+  };
+  const totalInvalid = total !== "" && !isValidAmount(total);
+  const yoursInvalid = yours !== "" && !isValidAmount(yours);
+  const receiverInvalid = receiver !== "" && (() => {
+    try {
+      Address.parse(receiver);
+      return false;
+    } catch {
+      return true;
+    }
+  })();
+
+  return (
+    <Screen>
+      <Field invalid={totalInvalid}>
+        <Legend>Bill</Legend>
+        <Row>
+          <Input
+            type="number"
+            inputMode="decimal"
+            placeholder="Total amount"
+            value={total}
+            onChange={(e) => setTotal(e.target.value)}
+            min={0}
+            step="0.01"
+          />
+          <TonBadge>
+            <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol" />
+          </TonBadge>
+        </Row>
+        {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
+      </Field>
+
+      <Field invalid={yoursInvalid}>
+        <Legend>Yours</Legend>
+        <Row>
+          <Input
+            type="number"
+            inputMode="decimal"
+            placeholder={`Your part`}
+            value={yours}
+            onChange={(e) => setYours(e.target.value)}
+            min={minPart}
+            step="0.01"
+          />
+          <TonBadge>
+            <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol" />
+          </TonBadge>
+        </Row>
+        {yoursInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
+      </Field>
+
+      <Field invalid={receiverInvalid}>
+        <Legend>Receiver</Legend>
+        <Row>
+          <Input
+            placeholder="TON address"
+            value={receiver}
+            onChange={(e) => setReceiver(e.target.value)}
+          />
+          <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
+          <ScanButton type="button" onClick={onScan} aria-label="Scan">
+            <img src="/qr.svg" width="16" height="16" alt="Scan QR" />
+          </ScanButton>
+        </Row>
+        {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
+      </Field>
+
+      <Footer />
+
+      <FixedCtaWrap>
+        <FixedCtaInner>
+          <PrimaryAction disabled={!receiver || !total || !yours || totalInvalid || yoursInvalid || receiverInvalid}>
+            Create
+          </PrimaryAction>
+        </FixedCtaInner>
+      </FixedCtaWrap>
+    </Screen>
+  );
+}
+
+export default SplitBill;

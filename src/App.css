@@ -2,4 +2,8 @@
   --tg-theme-bg-color: #efeff3;
   --tg-theme-button-color: #2eaddc;
   --tg-theme-button-text-color: white;
+  --fontSystem: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  /* Typography stacks */
+  --fontSF: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  --fontRoboto: "Roboto", var(--fontSF);
 }

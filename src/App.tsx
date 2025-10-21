@@ -1,13 +1,12 @@
 import "./App.css";
 import { TonConnectButton } from "@tonconnect/ui-react";
-import { Counter } from "./components/Counter";
-import { Jetton } from "./components/Jetton";
-import { TransferTon } from "./components/TransferTon";
 import styled from "styled-components";
-import { Button, FlexBoxCol, FlexBoxRow } from "./components/styled/styled";
-import { useTonConnect } from "./hooks/useTonConnect";
-import { CHAIN } from "@tonconnect/protocol";
 import "@twa-dev/sdk";
+import SplitBill from "./components/SplitBill";
+import BottomTabBar, { TabKey } from "./components/BottomTabBar";
+import { useEffect, useMemo, useState } from "react";
+import JoinScreen from "./components/JoinScreen";
+import HistoryScreen from "./components/HistoryScreen";
 
 const StyledApp = styled.div`
   background-color: #e8e8e8;
@@ -18,7 +17,8 @@ const StyledApp = styled.div`
     color: white;
   }
   min-height: 100vh;
-  padding: 20px 20px;
+  /* extra bottom padding so content doesn't hide behind fixed tab bar */
+  padding: 20px 20px calc(120px + env(safe-area-inset-bottom));
 `;
 
 const AppContainer = styled.div`
@@ -26,28 +26,44 @@ const AppContainer = styled.div`
   margin: 0 auto;
 `;
 
+const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0 65px;
+`;
+
 function App() {
-  const { network } = useTonConnect();
+  const [tab, setTab] = useState<TabKey>(() =>
+    (window.location.hash.replace("#", "") as TabKey) || "new"
+  );
+
+  // keep URL hash in sync so it persists after reload
+  useEffect(() => {
+    window.location.hash = tab;
+  }, [tab]);
+
+  const Screen = useMemo(() => {
+    switch (tab) {
+      case "join":
+        return <JoinScreen />;
+      case "history":
+        return <HistoryScreen />;
+      default:
+        return <SplitBill />;
+    }
+  }, [tab]);
 
   return (
     <StyledApp>
       <AppContainer>
-        <FlexBoxCol>
-          <FlexBoxRow>
-            <TonConnectButton />
-            <Button>
-              {network
-                ? network === CHAIN.MAINNET
-                  ? "mainnet"
-                  : "testnet"
-                : "N/A"}
-            </Button>
-          </FlexBoxRow>
-          <Counter />
-          <TransferTon />
-          <Jetton />
-        </FlexBoxCol>
+        <HeaderRow>
+          <TonConnectButton />
+        </HeaderRow>
+        {Screen}
       </AppContainer>
+      <BottomTabBar active={tab} onChange={setTab} />
     </StyledApp>
   );
 }

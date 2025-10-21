@@ -1,0 +1,14 @@
+/* Reset default body margin to remove white gaps */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fontSystem);
+}
+
+/* Optional: make sizing predictable */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
