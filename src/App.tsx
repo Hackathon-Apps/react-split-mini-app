@@ -16,7 +16,11 @@ const StyledApp = styled.div`
     background-color: #222;
     color: white;
   }
-  min-height: 100svh;
+  /* Pin app to a stable height so iOS keyboard overlays instead of
+     shrinking the visual viewport (Telegram provides this var). */
+  height: var(--tg-viewport-stable-height, 100svh);
+  min-height: var(--tg-viewport-stable-height, 100svh);
+  overflow: hidden;
   /* keep space for bottom tab bar only */
   padding: 16px 16px calc(88px + env(safe-area-inset-bottom));
 `;

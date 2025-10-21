@@ -1,5 +1,11 @@
 /* Reset default body margin to remove white gaps */
-html, body, #root {
+/* Use Telegram's stable viewport height so the on-screen
+   keyboard overlays instead of pushing our UI. */
+html, body {
+  height: var(--tg-viewport-stable-height, 100svh);
+}
+
+#root {
   height: 100%;
 }
 
@@ -11,4 +17,9 @@ body {
 /* Optional: make sizing predictable */
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+:root {
+  /* used for CTA offset above our custom bottom tab bar */
+  --bottom-bar-height: 88px;
 }
