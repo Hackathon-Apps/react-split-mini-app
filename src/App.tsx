@@ -36,9 +36,12 @@ const HeaderRow = styled.div`
 `;
 
 function App() {
-  const [tab, setTab] = useState<TabKey>(() =>
-    (window.location.hash.replace("#", "") as TabKey) || "new"
-  );
+  const [tab, setTab] = useState<TabKey>(() => {
+    const raw = window.location.hash.replace("#", "");
+    const candidate = (raw || "new") as TabKey;
+    const valid: TabKey[] = ["new", "join", "history"];
+    return valid.includes(candidate) ? candidate : "new";
+  });
 
   // keep URL hash in sync so it persists after reload
   useEffect(() => {
