@@ -50,7 +50,7 @@ const Input = styled.input`
   background: transparent;
   color: inherit;
   outline: none;
-  font-size: 14px;
+  font-size: 16px; /* prevent iOS auto-zoom */
 
   /* Hide number input spinners on all browsers */
   &[type="number"] {
@@ -68,7 +68,7 @@ const Input = styled.input`
     opacity: 1;
     font-family: var(--fontRoboto);
     font-weight: 600;
-    font-size: 15px;
+    font-size: 16px;
   }
 `;
 
@@ -125,7 +125,7 @@ const Footer = styled.div`
   height: 96px; /* reduced to avoid extra scroll while keeping CTA clear */
 `;
 
-const FixedCtaWrap = styled.div`
+const FixedCtaWrap = styled.div<{ hidden?: boolean }>`
   position: fixed;
   left: 0;
   right: 0;
@@ -134,6 +134,10 @@ const FixedCtaWrap = styled.div`
   justify-content: center;
   padding: 0 16px;
   z-index: 900; /* below tab bar (1000), above content */
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: ${(p) => (p.hidden ? "translateY(140%)" : "translateY(0)")};
+  opacity: ${(p) => (p.hidden ? 0 : 1)};
+  pointer-events: ${(p) => (p.hidden ? "none" : "auto")};
 `;
 
 const FixedCtaInner = styled.div`
@@ -155,7 +159,7 @@ const PrimaryAction = styled(Button)`
   }
 `;
 
-export function SplitBill() {
+export function SplitBill({ hideCta }: { hideCta?: boolean }) {
   const [total, setTotal] = useState("");
   const [yours, setYours] = useState("");
   const [receiver, setReceiver] = useState("");
@@ -165,7 +169,7 @@ export function SplitBill() {
     try {
       WebApp.showScanQrPopup({ text: "Scan TON address" }, (data) => {
         if (data) {
-          setReceiver(data);
+          setReceiver(data.replaceAll("ton://transfer/", ""));
           WebApp.closeScanQrPopup();
         }
       });
@@ -265,7 +269,7 @@ export function SplitBill() {
 
       <Footer />
 
-      <FixedCtaWrap>
+      <FixedCtaWrap hidden={hideCta} aria-hidden={hideCta ? true : undefined}>
         <FixedCtaInner>
           <PrimaryAction disabled={!receiver || !total || !yours || totalInvalid || yoursInvalid || receiverInvalid}>
             Create

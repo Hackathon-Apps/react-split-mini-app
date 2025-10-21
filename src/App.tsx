@@ -42,11 +42,41 @@ function App() {
     const valid: TabKey[] = ["new", "join", "history"];
     return valid.includes(candidate) ? candidate : "new";
   });
+  const [isEditing, setIsEditing] = useState(false);
 
   // keep URL hash in sync so it persists after reload
   useEffect(() => {
     window.location.hash = tab;
   }, [tab]);
+
+  // Detect when any input/textarea gains focus to hide UI elements
+  useEffect(() => {
+    const onFocusIn = (e: Event) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      const tag = t.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || t.getAttribute("contenteditable") === "true") {
+        setIsEditing(true);
+      }
+    };
+    const onFocusOut = () => {
+      // small delay to avoid flicker when switching fields
+      setTimeout(() => {
+        const ae = document.activeElement as HTMLElement | null;
+        if (!ae) return setIsEditing(false);
+        const tag = ae.tagName;
+        if (tag !== "INPUT" && tag !== "TEXTAREA" && ae.getAttribute("contenteditable") !== "true") {
+          setIsEditing(false);
+        }
+      }, 50);
+    };
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("focusout", onFocusOut);
+    return () => {
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("focusout", onFocusOut);
+    };
+  }, []);
 
   const Screen = useMemo(() => {
     switch (tab) {
@@ -55,7 +85,7 @@ function App() {
       case "history":
         return <HistoryScreen />;
       default:
-        return <SplitBill />;
+        return <SplitBill hideCta={isEditing} />;
     }
   }, [tab]);
 
@@ -67,7 +97,7 @@ function App() {
         </HeaderRow>
         {Screen}
       </AppContainer>
-      <BottomTabBar active={tab} onChange={setTab} />
+      <BottomTabBar active={tab} onChange={setTab} hidden={isEditing} />
     </StyledApp>
   );
 }

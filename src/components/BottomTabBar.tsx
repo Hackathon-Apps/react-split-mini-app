@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const Bar = styled.nav`
+const Bar = styled.nav<{ hidden?: boolean }>`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -9,6 +9,10 @@ const Bar = styled.nav`
   background: transparent;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   z-index: 1000;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: ${(p) => (p.hidden ? "translateY(120%)" : "translateY(0)")};
+  opacity: ${(p) => (p.hidden ? 0 : 1)};
+  pointer-events: ${(p) => (p.hidden ? "none" : "auto")};
 `;
 
 const Dock = styled.div`
@@ -59,12 +63,14 @@ export type TabKey = "new" | "join" | "history";
 export default function BottomTabBar({
   active,
   onChange,
+  hidden,
 }: {
   active: TabKey;
   onChange: (key: TabKey) => void;
+  hidden?: boolean;
 }) {
   return (
-    <Bar>
+    <Bar hidden={hidden} aria-hidden={hidden ? true : undefined}>
       <Dock>
         <Item active={active === "new"} onClick={() => onChange("new")}>
           <IconImg src={active === "new" ? "/bill-active.svg" : "/bill.svg"} alt="New" />
