@@ -1,13 +1,14 @@
 {
-  "name": "ton-starter-twa-vite",
+  "name": "split-bill",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "configbot": "node configure.js"
+    "configbot": "node configure.js",
+    "ton-build": "cd ton && blueprint build",
+    "ton-release": "cd ton && blueprint pack && npm publish --access public"
   },
   "dependencies": {
     "@orbs-network/ton-access": "^2.2.2",
@@ -21,9 +22,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.6",
-    "ton": "13.3.0",
-    "ton-core": "^0.46.0",
-    "ton-crypto": "^3.2.0",
     "use-local-storage": "^2.3.6",
     "vite-plugin-node-polyfills": "^0.7.0"
   },
@@ -34,6 +32,19 @@
     "@types/styled-components": "^5.1.26",
     "@vitejs/plugin-react": "^3.0.1",
     "typescript": "^4.9.5",
-    "vite": "^4.0.4"
+    "vite": "^4.0.4",
+    
+    "@ton/blueprint": ">=0.40.0",
+    "@ton/sandbox": ">=0.37.0",
+    "@ton/test-utils": ">=0.11.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "@ton/ton": ">=15.3.1 <16.0.0",
+    "@ton/crypto": "^3.3.0",
+    "ts-node": "^10.9.2",
+    "@ton/tolk-js": ">=1.0.0",
+    "@tact-lang/compiler": ">=1.6.13 <2.0.0",
+    "@ton-community/func-js": ">=0.10.0"
   }
 }

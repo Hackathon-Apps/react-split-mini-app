@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import styled from "styled-components";
-import { Address } from "ton";
+import { Address } from "@ton/ton";
 import { Button } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 
