@@ -3,15 +3,18 @@ import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-// Serve local manifest from /toncoin-manifest.json
+
 const manifestUrl = `${window.location.origin}/tonconnect-manifest.json`;
+const appUrl = "https://tagwaiter.ru/#new"
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <TonConnectUIProvider manifestUrl={manifestUrl}>
+  <TonConnectUIProvider 
+    manifestUrl={manifestUrl}
+    actionsConfiguration={{ twaReturnUrl: appUrl }}>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
