@@ -5,7 +5,7 @@ import App from "./App";
 import "./index.css";
 
 const manifestUrl = `${window.location.origin}/tonconnect-manifest.json`;
-const appUrl = "https://tagwaiter.ru/#new"
+const appUrl = "https://t.me/CryptoSplitBot?startapp"
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } },
