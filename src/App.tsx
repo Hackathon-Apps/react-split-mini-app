@@ -3,6 +3,7 @@ import { TonConnectButton } from "@tonconnect/ui-react";
 import styled from "styled-components";
 import "@twa-dev/sdk";
 import SplitBill from "./components/SplitBill";
+import BillDetails from "./components/ProcessScreen";
 import BottomTabBar, { TabKey } from "./components/BottomTabBar";
 import { useEffect, useMemo, useState } from "react";
 import JoinScreen from "./components/JoinScreen";
@@ -89,9 +90,14 @@ function App() {
       case "history":
         return <HistoryScreen />;
       default:
-        return <SplitBill hideCta={isEditing} />;
+        return <BillDetails
+            collectedTon={5}
+            endTimeSec={Math.floor(Date.now()/1000) + 5*60}
+            goalTon={11}
+            reciever={"EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"}
+        />;
     }
-  }, [tab, isEditing]);
+  }, [tab]);
 
   return (
     <StyledApp>
