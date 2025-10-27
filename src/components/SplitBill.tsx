@@ -6,7 +6,6 @@ import WebApp from "@twa-dev/sdk";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { useTonClient } from "../hooks/useTonClient";
 import { toNano } from "@ton/core";
-import { buildTonTransferLink } from "../../ton/scripts/transferLinkBuilder";
 
 const Screen = styled.div`
   display: flex;
@@ -233,24 +232,17 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
   const onCreate = useCallback(async () => {
     if (!canCreate) return;
     try {
-    const url = buildTonTransferLink({
-      to: receiver,
-      amountTon: yours,
-      // testnet: network === CHAIN.TESTNET, // если храните сеть — подставьте при необходимости
-    });
-
-    // Внутри Telegram Mini App это откроет @wallet:
-    if (typeof WebApp?.openTelegramLink === "function") {
-      WebApp.openTelegramLink(url);
-    } else {
-      // fallback для браузера
-      window.location.href = url;
+      await sender.send({
+        to: Address.parse(receiver),
+        value: toNano(yours),
+      });
+      // TonConnect UI will show "Open Wallet" and switch
+      // to Telegram Wallet inside the TWA for confirmation.
+    } catch (e) {
+      console.error(e);
+      alert("Failed to start transaction. Check address and amount.");
     }
-  } catch (e) {
-    console.error(e);
-    alert("Некорректный адрес или сумма.");
-  }
-}, [canCreate, receiver, yours]);
+  }, [canCreate, receiver, sender, yours]);
 
   return (
     <Screen>

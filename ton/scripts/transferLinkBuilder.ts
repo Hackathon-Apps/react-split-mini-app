@@ -7,7 +7,7 @@ export function buildTonTransferLink(params: {
 }) {
   const addr = Address.parse(params.to);
   // Для переводов на кошелёк — non-bounceable адрес:
-  const friendly = addr.toString({ bounceable: false, testOnly: params.testnet === true });
+  const friendly = addr.toString({ bounceable: false, testOnly: false });
   const amountNano = toNano(params.amountTon).toString(); // целое число нанотонов
   return `ton://transfer/${friendly}?amount=${amountNano}`;
 }
