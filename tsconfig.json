@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "ton/scripts/transferLinkBuilder.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

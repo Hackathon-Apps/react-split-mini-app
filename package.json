@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "configbot": "node configure.js",
     "ton-build": "cd ton && blueprint build",
+    "ton-run": "cd ton && blueprint run",
     "ton-release": "cd ton && blueprint pack && npm publish --access public"
   },
   "dependencies": {

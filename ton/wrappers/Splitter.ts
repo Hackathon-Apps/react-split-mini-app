@@ -2,16 +2,14 @@ import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, 
 
 export type SplitterConfig = {
     id: number;
-    counter: number;
 };
 
 export function splitterConfigToCell(config: SplitterConfig): Cell {
-    return beginCell().storeUint(config.id, 32).storeUint(config.counter, 32).endCell();
+    return beginCell().storeUint(config.id, 32).endCell();
 }
 
 export const Opcodes = {
-    OP_INCREASE: 0x7e8764ef,
-    OP_RESET: 0x3a752f06,
+    increase: 0x7e8764ef,
 };
 
 export class Splitter implements Contract {
@@ -35,51 +33,8 @@ export class Splitter implements Contract {
         });
     }
 
-    async sendIncrease(
-        provider: ContractProvider,
-        via: Sender,
-        opts: {
-            increaseBy: number;
-            value: bigint;
-            queryID?: number;
-        }
-    ) {
-        await provider.internal(via, {
-            value: opts.value,
-            sendMode: SendMode.PAY_GAS_SEPARATELY,
-            body: beginCell()
-                .storeUint(Opcodes.OP_INCREASE, 32)
-                .storeUint(opts.queryID ?? 0, 64)
-                .storeUint(opts.increaseBy, 32)
-                .endCell(),
-        });
-    }
-
-    async sendReset(
-        provider: ContractProvider,
-        via: Sender,
-        opts: {
-            value: bigint;
-            queryID?: number;
-        }
-    ) {
-        await provider.internal(via, {
-            value: opts.value,
-            sendMode: SendMode.PAY_GAS_SEPARATELY,
-            body: beginCell()
-                .storeUint(Opcodes.OP_RESET, 32)
-                .storeUint(opts.queryID ?? 0, 64)
-                .endCell(),
-        });
-    }
-
-    async getCounter(provider: ContractProvider) {
-        const result = await provider.get('currentCounter', []);
-        return result.stack.readNumber();
-    }
-
     async getID(provider: ContractProvider) {
-        const result = await provider.get('initialId', []);
+        const result = await provider.get('get_id', []);
         return result.stack.readNumber();
     }
 }

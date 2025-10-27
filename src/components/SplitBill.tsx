@@ -1,8 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Address } from "@ton/ton";
 import { Button } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
+import { useTonConnect } from "../hooks/useTonConnect";
+import { useTonClient } from "../hooks/useTonClient";
+import { toNano } from "@ton/core";
+import { buildTonTransferLink } from "../../ton/scripts/transferLinkBuilder";
 
 const Screen = styled.div`
   display: flex;
@@ -163,6 +167,8 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
   const [total, setTotal] = useState("");
   const [yours, setYours] = useState("");
   const [receiver, setReceiver] = useState("");
+  const { sender, connected } = useTonConnect();
+  const { client } = useTonClient();
 
   const onScan = useCallback(() => {
     // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -210,6 +216,41 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
       return true;
     }
   })();
+
+  const canCreate = useMemo(() => {
+    return (
+      !!receiver &&
+      !!total &&
+      !!yours &&
+      !totalInvalid &&
+      !yoursInvalid &&
+      !receiverInvalid &&
+      connected &&
+      !!client
+    );
+  }, [receiver, total, yours, totalInvalid, yoursInvalid, receiverInvalid, connected, client]);
+
+  const onCreate = useCallback(async () => {
+    if (!canCreate) return;
+    try {
+    const url = buildTonTransferLink({
+      to: receiver,
+      amountTon: yours,
+      // testnet: network === CHAIN.TESTNET, // если храните сеть — подставьте при необходимости
+    });
+
+    // Внутри Telegram Mini App это откроет @wallet:
+    if (typeof WebApp?.openTelegramLink === "function") {
+      WebApp.openTelegramLink(url);
+    } else {
+      // fallback для браузера
+      window.location.href = url;
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Некорректный адрес или сумма.");
+  }
+}, [canCreate, receiver, yours]);
 
   return (
     <Screen>
@@ -271,7 +312,7 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
 
       <FixedCtaWrap hidden={hideCta} aria-hidden={hideCta ? true : undefined}>
         <FixedCtaInner>
-          <PrimaryAction disabled={!receiver || !total || !yours || totalInvalid || yoursInvalid || receiverInvalid}>
+          <PrimaryAction onClick={onCreate} disabled={!canCreate}>
             Create
           </PrimaryAction>
         </FixedCtaInner>
