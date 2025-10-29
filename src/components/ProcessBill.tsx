@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import styled, { css } from "styled-components";
+import styled, {css} from "styled-components";
 import {Button} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
@@ -14,11 +14,12 @@ import PaySheet from "./PaySheet";
  */
 export type BillDetailsProps = {
     goalTon: number;
-    collectedTon: number;
+    collected: number;
     receiver: string;
     endTimeSec: number;
     serverNowSec?: number;
     history?: Array<{ id: string; from: string; amountTon: number; atSec: number }>;
+    onClose?: () => void
 };
 
 // ========== styles ==========
@@ -109,7 +110,7 @@ const PrimaryAction = styled(Button)`
   font-weight: 600 !important;
 `;
 
-const IconBtn = styled.button<{disabled?: boolean}>`
+const IconBtn = styled.button<{ disabled?: boolean }>`
   width: 48px;
   height: 48px;
   border-radius: 12px;
@@ -155,7 +156,7 @@ const HistoryCard = styled.div`
   overflow: hidden;
 `;
 
-const HistoryHeader = styled.button<{open?: boolean}>`
+const HistoryHeader = styled.button<{ open?: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
@@ -166,8 +167,15 @@ const HistoryHeader = styled.button<{open?: boolean}>`
   cursor: pointer;
   color: inherit;
 
-  & > span { font-weight: 700; font-size: 16px; }
-  & svg { transition: transform 250ms ease; transform: rotate(${({open}) => (open ? 180 : 0)}deg); }
+  & > span {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  & svg {
+    transition: transform 250ms ease;
+    transform: rotate(${({open}) => (open ? 180 : 0)}deg);
+  }
 `;
 
 const HistoryBodyOuter = styled.div`
@@ -261,7 +269,8 @@ function useSyncedCountdown(endTimeSec: number, serverNowSec?: number, resyncEve
             try {
                 const newOffset = serverNowSec - Math.floor(Date.now() / 1000);
                 setOffset(newOffset);
-            } catch {}
+            } catch {
+            }
         }, resyncEveryMs);
         return () => clearInterval(r);
     }, [serverNowSec, resyncEveryMs]);
@@ -270,19 +279,21 @@ function useSyncedCountdown(endTimeSec: number, serverNowSec?: number, resyncEve
 }
 
 // ========== component ==========
-export default function BillDetails({
+export default function ProcessBill({
                                         goalTon,
-                                        collectedTon,
+                                        collected,
                                         receiver,
                                         endTimeSec,
                                         serverNowSec,
                                         history,
+                                        onClose
                                     }: BillDetailsProps) {
     const leftSec = useSyncedCountdown(endTimeSec, serverNowSec);
+    const [collectedTon, setCollectedTon] = useState(collected)
 
     const percent = useMemo(() => (goalTon <= 0 ? 0 : (collectedTon / goalTon) * 100), [goalTon, collectedTon]);
     const leftTon = Math.max(0, goalTon - collectedTon);
-    const url = useMemo(() => buildMiniAppLink("CryptoSplitBot", { screen: "bill", id: receiver }), [receiver]);
+    const url = useMemo(() => buildMiniAppLink("CryptoSplitBot", {screen: "bill", id: receiver}), [receiver]);
 
     const [shareOpen, setShareOpen] = useState(false);
     const [payOpen, setPayOpen] = useState(false);
@@ -296,6 +307,12 @@ export default function BillDetails({
     const bodyOuterRef = useRef<HTMLDivElement | null>(null);
     const bodyInnerRef = useRef<HTMLDivElement | null>(null);
     const [bodyHeight, setBodyHeight] = useState(0);
+
+    useEffect(() => {
+        if (leftSec == 0) {
+            onClose?.()
+        }
+    }, [leftSec]);
 
     useEffect(() => {
         const measure = () => {
@@ -320,11 +337,21 @@ export default function BillDetails({
                             : "translate(calc(-50% - 80px), -50%) scale(1.0)",
                         transition: "transform 420ms ease"
                     }}>
-                        <div style={{position:"relative", width:200, height:200}}>
-                            <div style={{position:"absolute", inset:0, opacity: engaged ? 0 : 1, transition:"opacity 300ms ease"}}>
+                        <div style={{position: "relative", width: 200, height: 200}}>
+                            <div style={{
+                                position: "absolute",
+                                inset: 0,
+                                opacity: engaged ? 0 : 1,
+                                transition: "opacity 300ms ease"
+                            }}>
                                 <ProgressRing value={percent} color="#2990ff"/>
                             </div>
-                            <div style={{position:"absolute", inset:0, opacity: engaged ? 1 : 0, transition:"opacity 300ms ease"}}>
+                            <div style={{
+                                position: "absolute",
+                                inset: 0,
+                                opacity: engaged ? 1 : 0,
+                                transition: "opacity 300ms ease"
+                            }}>
                                 <ProgressRing value={percent} color="#27ae60"/>
                             </div>
                         </div>
@@ -374,7 +401,8 @@ export default function BillDetails({
                 <HistoryHeader open={historyOpen} onClick={() => setHistoryOpen(o => !o)} aria-expanded={historyOpen}>
                     <span>History</span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                              strokeLinejoin="round"/>
                     </svg>
                 </HistoryHeader>
                 <HistoryBodyOuter ref={bodyOuterRef} style={{height: bodyHeight, transition: "height 260ms ease"}}>
@@ -407,7 +435,9 @@ export default function BillDetails({
                 totalTon={goalTon}
                 amountTon={amount}
                 onChange={setAmount}
-                onPay={() => {/* TonConnect send */}}
+                onPay={(amount) => {/* TonConnect send */
+                    setCollectedTon(collectedTon + amount)
+                }}
                 balanceTon={"•••"}
             />
         </Screen>

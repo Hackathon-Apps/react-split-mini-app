@@ -76,7 +76,7 @@ export default function PaySheet({
     onClose: () => void;
     amountTon: number;
     onChange: (v: number) => void;
-    onPay: () => void;
+    onPay: (amount: number) => void;
     totalTon: number;       // проценты считаются от общей суммы счёта
     balanceTon?: string;
     clampToTotal?: boolean;
@@ -122,7 +122,7 @@ export default function PaySheet({
                 <Chip onClick={() => add(5)}>+5</Chip>
             </QuickRow>
 
-            <PayBtn onClick={onPay} disabled={!canPay}>
+            <PayBtn onClick={() => onPay(amountTon)} disabled={!canPay}>
                 Pay {amountTon || 0} TON
             </PayBtn>
 

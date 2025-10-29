@@ -2,13 +2,13 @@ import "./App.css";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import styled from "styled-components";
 import "@twa-dev/sdk";
-import SplitBill from "./components/SplitBill";
-import BillDetails from "./components/ProcessScreen";
 import BottomTabBar, { TabKey } from "./components/BottomTabBar";
 import { useEffect, useMemo, useState } from "react";
 import HistoryScreen from "./components/HistoryScreen";
 import {scanQR} from "./utils/scanQR";
 import WebApp from "@twa-dev/sdk";
+import {BillProvider} from "./state/billStore";
+import BillsScreen from "./components/BillsScreen";
 
 const StyledApp = styled.div`
   background-color: #e8e8e8;
@@ -129,12 +129,7 @@ function App() {
       case "history":
         return <HistoryScreen />;
       default:
-        return <BillDetails
-            collectedTon={5}
-            endTimeSec={Math.floor(Date.now()/1000) + 5*60}
-            goalTon={11}
-            receiver={"EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"}
-        />;
+        return <BillsScreen/>;
     }
   }, [tab]);
 
@@ -147,15 +142,21 @@ function App() {
   }, [tab]);
 
   return (
-    <StyledApp>
-      <AppContainer>
-        <HeaderRow>
-          <TonConnectButton />
-        </HeaderRow>
-        {Screen}
-      </AppContainer>
-      <BottomTabBar active={tab} onChange={setTab} hidden={isEditing || isModalOpen} />
-    </StyledApp>
+      <BillProvider>
+        <StyledApp>
+          <AppContainer>
+            <HeaderRow>
+              <TonConnectButton />
+            </HeaderRow>
+            {Screen}
+          </AppContainer>
+          <BottomTabBar
+              active={tab}
+              onChange={setTab}
+              hidden={isEditing || isModalOpen}
+          />
+        </StyledApp>
+      </BillProvider>
   );
 }
 

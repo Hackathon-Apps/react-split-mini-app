@@ -5,7 +5,7 @@ import { Button } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { useTonClient } from "../hooks/useTonClient";
-import { toNano } from "@ton/core";
+import {OpenBill} from "../state/billStore";
 
 const Screen = styled.div`
   display: flex;
@@ -162,9 +162,8 @@ const PrimaryAction = styled(Button)`
   }
 `;
 
-export function SplitBill({ hideCta }: { hideCta?: boolean }) {
+export function CreateBill({ hideCta, onCreated }: { hideCta?: boolean, onCreated: (payload: OpenBill) => void}) {
   const [total, setTotal] = useState("");
-  const [yours, setYours] = useState("");
   const [receiver, setReceiver] = useState("");
   const { sender, connected } = useTonConnect();
   const { client } = useTonClient();
@@ -206,7 +205,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
     return Number.isFinite(n) && n > minPart;
   };
   const totalInvalid = total !== "" && !isValidAmount(total);
-  const yoursInvalid = yours !== "" && !isValidAmount(yours);
   const receiverInvalid = receiver !== "" && (() => {
     try {
       Address.parse(receiver);
@@ -220,29 +218,17 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
     return (
       !!receiver &&
       !!total &&
-      !!yours &&
       !totalInvalid &&
-      !yoursInvalid &&
-      !receiverInvalid &&
-      connected &&
-      !!client
+      !receiverInvalid //&&
+      //connected &&
+      //!!client
     );
-  }, [receiver, total, yours, totalInvalid, yoursInvalid, receiverInvalid, connected, client]);
+  }, [receiver, total, totalInvalid, receiverInvalid, connected, client]);
 
-  const onCreate = useCallback(async () => {
-    if (!canCreate) return;
-    try {
-      await sender.send({
-        to: Address.parse(receiver),
-        value: toNano(yours),
-      });
-      // TonConnect UI will show "Open Wallet" and switch
-      // to Telegram Wallet inside the TWA for confirmation.
-    } catch (e) {
-      console.error(e);
-      alert("Failed to start transaction. Check address and amount.");
-    }
-  }, [canCreate, receiver, sender, yours]);
+  const handleCreate = () => {
+    //Ждем ответ с бэкэнда
+    onCreated({id: "123", receiver, goalTon: parseFloat(total), endTimeSec: Math.floor(Date.now() / 1000) + 600})
+  }
 
   return (
     <Screen>
@@ -265,25 +251,6 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
         {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
       </Field>
 
-      <Field invalid={yoursInvalid}>
-        <Legend>Yours</Legend>
-        <Row>
-          <Input
-            type="number"
-            inputMode="decimal"
-            placeholder={`Your part`}
-            value={yours}
-            onChange={(e) => setYours(e.target.value)}
-            min={minPart}
-            step="0.01"
-          />
-          <TonBadge>
-            <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol" />
-          </TonBadge>
-        </Row>
-        {yoursInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
-      </Field>
-
       <Field invalid={receiverInvalid}>
         <Legend>Receiver</Legend>
         <Row>
@@ -304,7 +271,7 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
 
       <FixedCtaWrap hidden={hideCta} aria-hidden={hideCta ? true : undefined}>
         <FixedCtaInner>
-          <PrimaryAction onClick={onCreate} disabled={!canCreate}>
+          <PrimaryAction onClick={handleCreate} disabled={!canCreate}>
             Create
           </PrimaryAction>
         </FixedCtaInner>
@@ -313,4 +280,4 @@ export function SplitBill({ hideCta }: { hideCta?: boolean }) {
   );
 }
 
-export default SplitBill;
+export default CreateBill;
