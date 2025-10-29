@@ -6,8 +6,9 @@ import SplitBill from "./components/SplitBill";
 import BillDetails from "./components/ProcessScreen";
 import BottomTabBar, { TabKey } from "./components/BottomTabBar";
 import { useEffect, useMemo, useState } from "react";
-import JoinScreen from "./components/JoinScreen";
 import HistoryScreen from "./components/HistoryScreen";
+import {scanQR} from "./utils/scanQR";
+import WebApp from "@twa-dev/sdk";
 
 const StyledApp = styled.div`
   background-color: #e8e8e8;
@@ -43,11 +44,12 @@ const HeaderRow = styled.div`
 function App() {
   const [tab, setTab] = useState<TabKey>(() => {
     const raw = window.location.hash.replace("#", "");
-    const candidate = (raw || "new") as TabKey;
-    const valid: TabKey[] = ["new", "join", "history"];
-    return valid.includes(candidate) ? candidate : "new";
+    const candidate = (raw || "bills") as TabKey;
+    const valid: TabKey[] = ["bills", "join", "history"];
+    return valid.includes(candidate) ? candidate : "bills";
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // keep URL hash in sync so it persists after reload
   useEffect(() => {
@@ -83,10 +85,47 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const hasOpenModal = () => {
+      // 1) наши модалки
+      const mine = document.querySelector('[data-modal="true"][data-open="true"]');
+      if (mine) return true;
+
+      // 2) сторонние/библиотечные: роль диалога и явно не скрыт
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      for (const d of dialogs as any as HTMLElement[]) {
+        const hidden = d.getAttribute("aria-hidden");
+        const pe = getComputedStyle(d).pointerEvents;
+        if (hidden === "true") continue;
+        if (pe === "none") continue;         // закрытые «за экраном»
+        // на всякий — проверка, есть ли хоть какая-то площадь в вьюпорте
+        const r = d.getBoundingClientRect();
+        const visible = r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+        if (visible) return true;
+      }
+      return false;
+    };
+
+    const update = () => setIsModalOpen(hasOpenModal());
+    update();
+
+    const mo = new MutationObserver(update);
+    mo.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class", "open", "hidden", "aria-hidden", "data-open"]
+    });
+
+    window.addEventListener("resize", update);
+    return () => {
+      mo.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   const Screen = useMemo(() => {
     switch (tab) {
-      case "join":
-        return <JoinScreen />;
       case "history":
         return <HistoryScreen />;
       default:
@@ -94,8 +133,16 @@ function App() {
             collectedTon={5}
             endTimeSec={Math.floor(Date.now()/1000) + 5*60}
             goalTon={11}
-            reciever={"EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"}
+            receiver={"EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"}
         />;
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab == "join") {
+      scanQR((link) => {
+        WebApp.openTelegramLink(link)
+      })
     }
   }, [tab]);
 
@@ -107,7 +154,7 @@ function App() {
         </HeaderRow>
         {Screen}
       </AppContainer>
-      <BottomTabBar active={tab} onChange={setTab} hidden={isEditing} />
+      <BottomTabBar active={tab} onChange={setTab} hidden={isEditing || isModalOpen} />
     </StyledApp>
   );
 }

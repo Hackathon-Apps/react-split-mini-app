@@ -58,7 +58,7 @@ const IconImg = styled.img`
   height: 22px;
 `;
 
-export type TabKey = "new" | "join" | "history";
+export type TabKey = "bills" | "join" | "history";
 
 export default function BottomTabBar({
   active,
@@ -72,8 +72,8 @@ export default function BottomTabBar({
   return (
     <Bar hidden={hidden} aria-hidden={hidden ? true : undefined}>
       <Dock>
-        <Item active={active === "new"} onClick={() => onChange("new")}>
-          <IconImg src={active === "new" ? "/bill-active.svg" : "/bill.svg"} alt="New" />
+        <Item active={active === "bills"} onClick={() => onChange("bills")}>
+          <IconImg src={active === "bills" ? "/bill-active.svg" : "/bill.svg"} alt="New" />
           <Label>New</Label>
         </Item>
         <Item active={active === "join"} onClick={() => onChange("join")}>
