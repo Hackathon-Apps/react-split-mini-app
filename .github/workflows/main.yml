@@ -14,13 +14,7 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
-      - name: install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-        env:
-          CI: false
-      - name: Deploy to server
+      - name: Build and Deploy to server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -28,7 +22,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
-            cd hackaton/twa
+            cd hackaton/react-split-mini-app
             git pull
             export NVM_DIR="$HOME/.nvm"
             source "$NVM_DIR/nvm.sh"
@@ -36,13 +30,8 @@ jobs:
             yarn
             yarn build
             rm -rf /var/www/tagwaiter.ru/dist/
-            mv dist/ /var/www//
-            sudo systemctl restart nginx
-      - name: Deploy to gh-pages
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
-
+            mv dist/ /var/www/tagwaiter.ru/
+            systemctl restart nginx
+      
 permissions:
   contents: write
