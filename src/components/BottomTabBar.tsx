@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import {useUIState} from "../state/uiState";
 
 const Bar = styled.nav<{ hidden?: boolean }>`
   position: fixed;
@@ -63,14 +64,13 @@ export type TabKey = "bills" | "join" | "history";
 export default function BottomTabBar({
   active,
   onChange,
-  hidden,
 }: {
   active: TabKey;
   onChange: (key: TabKey) => void;
-  hidden?: boolean;
 }) {
+  const {isEditing, isModalOpen} = useUIState()
   return (
-    <Bar hidden={hidden} aria-hidden={hidden ? true : undefined}>
+    <Bar hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>
       <Dock>
         <Item active={active === "bills"} onClick={() => onChange("bills")}>
           <IconImg src={active === "bills" ? "/bill-active.svg" : "/bill.svg"} alt="New" />

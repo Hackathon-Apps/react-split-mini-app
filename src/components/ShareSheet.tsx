@@ -10,8 +10,8 @@ const QrButton = styled.button`
   margin: 0 auto 12px;
   padding: 12px;
   border-radius: 16px;
-  border: 1px solid #2c2c2c;
-  background: #000;
+  border: 1px solid var(--stroke);
+  background: var(--surface-1);
   cursor: copy;
   position: relative;
   outline: none;
@@ -23,7 +23,7 @@ const QrButton = styled.button`
 const CopiedBadge = styled.div<{ show: boolean }>`
   position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
   padding: 6px 10px; border-radius: 10px;
-  background: rgba(255,255,255,0.12);
+  background: color-mix(in oklab, var(--text) 12%, transparent);
   font-size: 12px; backdrop-filter: blur(6px);
   opacity: ${(p) => (p.show ? 1 : 0)};
   transition: opacity .18s ease;
@@ -35,8 +35,8 @@ const SendBtn = styled(Button)`
   border-radius: 14px;
   padding: 14px 20px;
   font-size: 16px;
-  background-color: #2990FF !important;
-  color: #FFFFFF !important;
+  background-color: var(--accent) !important;
+  color: var(--accent-contrast) !important;
   font-family: var(--fontSF) !important;
   font-weight: 600 !important;
 `;

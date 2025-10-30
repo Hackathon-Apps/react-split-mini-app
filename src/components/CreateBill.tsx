@@ -6,6 +6,7 @@ import WebApp from "@twa-dev/sdk";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { useTonClient } from "../hooks/useTonClient";
 import {OpenBill} from "../state/billStore";
+import {useUIState} from "../state/uiState";
 
 const Screen = styled.div`
   display: flex;
@@ -21,12 +22,9 @@ const Field = styled.fieldset<{ invalid?: boolean }>`
   margin: 0;
   padding: 6px 12px 10px;
   border-radius: 20px;
-  border: 1px solid ${(p) => (p.invalid ? "#ff4d4f" : "#c2c2c2")};
+  border: 1px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--stroke)")};
   background: transparent;
 
-  @media (prefers-color-scheme: dark) {
-    border-color: ${(p) => (p.invalid ? "#ff6b6b" : "#3a3a3a")};
-  }
 `;
 
 const Legend = styled.legend`
@@ -162,11 +160,12 @@ const PrimaryAction = styled(Button)`
   }
 `;
 
-export function CreateBill({ hideCta, onCreated }: { hideCta?: boolean, onCreated: (payload: OpenBill) => void}) {
+export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => void}) {
   const [total, setTotal] = useState("");
   const [receiver, setReceiver] = useState("");
   const { sender, connected } = useTonConnect();
   const { client } = useTonClient();
+  const { isEditing, isModalOpen } = useUIState();
 
   const onScan = useCallback(() => {
     // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -223,7 +222,7 @@ export function CreateBill({ hideCta, onCreated }: { hideCta?: boolean, onCreate
       //connected &&
       //!!client
     );
-  }, [receiver, total, totalInvalid, receiverInvalid, connected, client]);
+  }, [receiver, total, connected, client]);
 
   const handleCreate = () => {
     //Ждем ответ с бэкэнда
@@ -269,7 +268,7 @@ export function CreateBill({ hideCta, onCreated }: { hideCta?: boolean, onCreate
 
       <Footer />
 
-      <FixedCtaWrap hidden={hideCta} aria-hidden={hideCta ? true : undefined}>
+      <FixedCtaWrap hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>
         <FixedCtaInner>
           <PrimaryAction onClick={handleCreate} disabled={!canCreate}>
             Create

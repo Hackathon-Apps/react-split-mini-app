@@ -15,7 +15,7 @@ export type BottomSheetProps = {
 
 const Backdrop = styled.div<{ open: boolean }>`
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: var(--backdrop);
   opacity: ${(p) => (p.open ? 1 : 0)};
   pointer-events: ${(p) => (p.open ? "auto" : "none")};
   transition: opacity .2s ease;
@@ -27,12 +27,14 @@ const Sheet = styled.div<{ open: boolean }>`
   bottom: env(safe-area-inset-bottom);
   transform: translateY(${(p) => (p.open ? "0%" : "110%")});
   transition: transform .24s ease;
-  background: #111;
+  background: var(--surface-2);
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
   padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
   z-index: 999;
   pointer-events: ${(p) => (p.open ? "auto" : "none")};
+  color: var(--text);
+  box-shadow: -8px 24px rgba(0,0,0,.18);;
 `;
 
 const Inner = styled.div`
@@ -42,14 +44,15 @@ const Inner = styled.div`
 
 const Handle = styled.div`
   width: 44px; height: 4px; border-radius: 2px;
-  background: #333; margin: 0 auto 12px;
+  background: var(--separator); margin: 0 auto 12px;
 `;
 
 const CloseX = styled.button`
   position: absolute; right: 12px; top: 12px;
   width: 32px; height: 32px; border-radius: 10px;
-  border: 0; background: rgba(255,255,255,0.06);
+  border: 0; background: color-mix(in oklab, var(--text) 10%, transparent);
   color: inherit; display: inline-flex; align-items: center; justify-content: center;
+  &:hover { background: color-mix(in oklab, var(--text) 16%, transparent); }
 `;
 
 export default function BottomSheet({

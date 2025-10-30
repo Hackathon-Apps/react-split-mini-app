@@ -334,7 +334,7 @@ export default function ProcessBill({
                         // при неактивации смещаем вправо от центра, при активации возвращаем в центр
                         transform: engaged
                             ? "translate(-50%, -50%) scale(1.04)"
-                            : "translate(calc(-50% - 80px), -50%) scale(1.0)",
+                            : "translate(calc(-50% - 75px), -50%) scale(1.0)",
                         transition: "transform 420ms ease"
                     }}>
                         <div style={{position: "relative", width: 200, height: 200}}>
@@ -361,7 +361,7 @@ export default function ProcessBill({
                     <TimerBox hidden={engaged} aria-live="polite" style={{
                         transform: engaged
                             ? "translate(-50%, -50%) scale(0.98)"
-                            : "translate(calc(-50% + 80px), -50%)",
+                            : "translate(calc(-50% + 75px), -50%)",
                         transition: "opacity 320ms ease, transform 420ms ease"
                     }}>
                         <TimeLeft>{formatMMSS(leftSec)}</TimeLeft>

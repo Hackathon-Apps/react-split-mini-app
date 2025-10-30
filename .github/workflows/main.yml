@@ -36,7 +36,7 @@ jobs:
             yarn
             yarn build
             rm -rf /var/www/tagwaiter.ru/dist/
-            mv dist/ /var/www/tagwaiter.ru/
+            mv dist/ /var/www//
             sudo systemctl restart nginx
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@4.1.4

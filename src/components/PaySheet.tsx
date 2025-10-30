@@ -15,7 +15,7 @@ const AmountInput = styled.input`
   font-size: 34px;          /* >=16px чтобы iOS не зумил */
   font-weight: 700;
   background: transparent;
-  color: inherit;
+  color: var(--text);
   border: none;
   outline: none;
   padding: 6px 1px;
@@ -28,6 +28,7 @@ const AmountInput = styled.input`
 const Unit = styled.small`
   font-size: 24px; font-weight: 600; opacity: .8;
   padding-right: 33%;
+  color: var(--muted);
 `;
 
 const QuickRow = styled.div`
@@ -36,7 +37,7 @@ const QuickRow = styled.div`
 `;
 const Chip = styled.button`
   min-width: 64px; height: 36px; padding: 0 10px;
-  border-radius: 10px; border: 1px solid #2c2c2c; background: transparent; color: inherit;
+  border-radius: 10px; border: 1px solid var(--stroke); background: var(--surface-1); color: var(--text);
   font-weight: 600;
 `;
 
@@ -45,13 +46,13 @@ const PayBtn = styled(Button)`
   border-radius: 12px;
   padding: 14px 20px; font-size: 16px;
   margin: 4px 0 10px;
-  background-color: #2676ff !important;
-  color: #fff !important; font-weight: 700 !important;
+  background-color: var(--accent) !important;
+  color: var(--accent-contrast) !important; font-weight: 700 !important;
 `;
 
 const Balance = styled.div`
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  opacity: .85; font-size: 14px;
+  opacity: .85; font-size: 14px; color: var(--muted);
   & img { width: 16px; height: 16px; }
 `;
 
