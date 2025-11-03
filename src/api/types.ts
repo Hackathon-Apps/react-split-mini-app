@@ -5,16 +5,27 @@ export interface Bill {
     id: string;
     goal: number;         // nanoton
     collected: number;    // nanoton
-    dest_address: string;
-    status: BillStatus;
+    creator_address: string;
+    destination_address: string;
     created_at: string;
+    status: BillStatus;
+    proxy_wallet_address: string;
+    transactions?: Transaction[];
+}
+
+export interface Transaction {
+    id: string;
+    bill_id: string;
+    amount: number;
+    sender_address: string;
+    created_at: string;
+    op_type: OpType;
 }
 
 export type OpType = "CONTRIBUTE" | "REFUND" | "WITHDRAW";
 
 export interface TxPayload {
-    amount: string;        // nanoton (строка)
-    sender_address: string;
+    amount: number;
     op_type: OpType;
 }
 

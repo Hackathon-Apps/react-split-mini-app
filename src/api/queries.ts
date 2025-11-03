@@ -34,7 +34,11 @@ export function useCreateTxMutation(billId: string, sender: string) {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (tx: TxPayload) =>
-            http.post(`/bills/${billId}/transactions`, tx, { sender }),
+            http.post(
+                `/bills/${billId}/transactions`,
+                {...tx, amount: toNano(tx.amount).toString()},
+                { sender }
+            ),
         onSuccess: (_res, _vars, _ctx) => {
             // Обновим карточку счёта и историю
             qc.invalidateQueries({ queryKey: ["bill"] });

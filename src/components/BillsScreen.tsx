@@ -27,13 +27,7 @@ export default function BillsScreen() {
 
     return (
         <ProcessBill
-            // у вас уже есть эти пропсы — просто прокидываем из bill
-            receiver={bill.receiver}
-            destAddress={bill.destAddress}
-            goalTon={bill.goalTon}
-            endTimeSec={bill.endTimeSec}
-            collected={bill.collectedTon}
-            // опционально: дайте способ выйти из открытого счёта
+            bill={bill}
             onClose={handleClose}
         />
     );

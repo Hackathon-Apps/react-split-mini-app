@@ -3,13 +3,14 @@ import { TonConnectButton } from "@tonconnect/ui-react";
 import styled from "styled-components";
 import "@twa-dev/sdk";
 import BottomTabBar, { TabKey } from "./components/BottomTabBar";
-import { useEffect, useMemo, useState } from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import HistoryScreen from "./components/HistoryScreen";
 import {scanQR} from "./utils/scanQR";
 import WebApp from "@twa-dev/sdk";
-import {BillProvider} from "./state/billStore";
+import {OpenBill, useBillStore} from "./state/billStore";
 import BillsScreen from "./components/BillsScreen";
 import {UIStateProvider} from "./state/uiState";
+import {readStartPayload} from "./utils/deeplink";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -39,7 +40,9 @@ function App() {
     const valid: TabKey[] = ["bills", "join", "history"];
     return valid.includes(candidate) ? candidate : "bills";
   });
-  // keep URL hash in sync so it persists after reload
+    const handledRef = useRef(false); // защита от повторов (HMR/ремонтовка)
+    const {setBill} = useBillStore();
+    // keep URL hash in sync so it persists after reload
   useEffect(() => {
     window.location.hash = tab;
   }, [tab]);
@@ -62,9 +65,26 @@ function App() {
   }, [tab]);
 
 
+    useEffect(() => {
+        if (handledRef.current) return;
+        handledRef.current = true;
+
+        // Telegram WebApp готов к работе
+        WebApp.ready();
+
+        // 1) читаем параметр из initDataUnsafe / ?tgWebAppStartParam=
+        const payload = readStartPayload<OpenBill>();
+        if (!payload) return;
+
+        console.log(payload);
+        setBill(payload);
+
+        const url = new URL(location.href);
+        url.searchParams.delete("tgWebAppStartParam");
+        history.replaceState({}, "", url);
+    }, []);
 
   return (
-      <BillProvider>
         <UIStateProvider>
           <StyledApp>
             <AppContainer>
@@ -79,7 +99,6 @@ function App() {
             />
           </StyledApp>
         </UIStateProvider>
-      </BillProvider>
   );
 }
 

@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
+import {Transaction} from "../api/types";
 
 export type BillStatus = "ACTIVE" | "COMPLETED" | "REFUNDED" | "CANCELLED";
 
@@ -10,6 +11,7 @@ export type OpenBill = {
     endTimeSec: number;
     status: BillStatus;
     collectedTon: number;
+    transactions?: Transaction[];
 };
 
 type BillCtx = {

@@ -219,8 +219,8 @@ export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => vo
       !!receiver &&
       !!total &&
       !totalInvalid &&
-      !receiverInvalid// &&
-      //!!sender
+      !receiverInvalid &&
+      !!sender
     );
   }, [receiver, total, sender]);
 
@@ -231,12 +231,13 @@ export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => vo
     })
     onCreated({
         id: res.id,
-        receiver,
-        destAddress: res.dest_address,
+        receiver: res.destination_address,
+        destAddress: res.proxy_wallet_address,
         goalTon: parseFloat(total),
         endTimeSec: Math.floor(Date.parse(res.created_at) / 1000) + 600,
         collectedTon: res.collected,
         status: res.status,
+        transactions: res.transactions,
     })
   }
 

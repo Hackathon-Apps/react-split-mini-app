@@ -5,23 +5,15 @@ import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
-import {useTonBalance, useTonTransfer} from "../api/queries";
+import {useCreateTxMutation, useTonBalance, useTonTransfer} from "../api/queries";
 import {buildContributePayload, formatTon} from "../utils/ton";
+import {OpenBill} from "../state/billStore";
+import {useTonAddress} from "@tonconnect/ui-react";
 
 export type BillDetailsProps = {
-    goalTon: number;
-    collected: number;
-    receiver: string;
-    destAddress: string;
-    endTimeSec: number;
-    serverNowSec?: number;
-    history?: Array<{ id: string; from: string; amountTon: number; atSec: number }>;
+    bill: OpenBill
     onClose?: () => void
 };
-
-// адрес контракта для приема средств
-// TODO replace
-const CONTRACT_ADDR = 'EQDthMBd5yXbGBZWKu9M1VyIRVYM0N_rY0wnjJ7xJUfoS1J-';
 
 // ========== styles ==========
 const Screen = styled.div`
@@ -39,14 +31,6 @@ const SummaryCard = styled.div`
     align-items: center;
     gap: 16px;
     padding: 16px;
-`;
-
-const Row = styled.div`
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
 `;
 
 const Stage = styled.div`
@@ -80,7 +64,7 @@ const TimerBox = styled.div<{ hidden?: boolean }>`
 `;
 
 const TimeLeft = styled.div`
-    font-family: var(--fontSF);
+    font-family: var(--fontSF),serif;
     font-weight: 450;
     font-size: 45px;
     letter-spacing: 0.3px;
@@ -107,7 +91,7 @@ const PrimaryAction = styled(Button)`
     flex-grow: 2;
     background-color: #2990ff !important;
     color: #ffffff !important;
-    font-family: var(--fontSF) !important;
+    font-family: var(--fontSF),serif !important;
     font-weight: 600 !important;
 `;
 
@@ -279,29 +263,24 @@ function useSyncedCountdown(endTimeSec: number, serverNowSec?: number, resyncEve
 
 // ========== component ==========
 export default function ProcessBill({
-                                        goalTon,
-                                        collected,
-                                        receiver,
-                                        destAddress,
-                                        endTimeSec,
-                                        serverNowSec,
-                                        history,
+                                        bill,
                                         onClose
                                     }: BillDetailsProps) {
     const {wallet, network} = useTonConnect();
-    const leftSec = useSyncedCountdown(endTimeSec, serverNowSec);
-    const [collectedTon, setCollectedTon] = useState(collected)
+    const sender = useTonAddress();
+    const leftSec = useSyncedCountdown(bill.endTimeSec);
 
-    const percent = useMemo(() => (goalTon <= 0 ? 0 : (collectedTon / goalTon) * 100), [goalTon, collectedTon]);
-    const leftTon = Math.max(0, goalTon - collectedTon);
-    const url = useMemo(() => buildMiniAppLink("CryptoSplitBot", {screen: "bill", id: receiver}), [receiver]);
+    const percent = useMemo(() => (bill.goalTon <= 0 ? 0 : (bill.collectedTon / bill.goalTon) * 100), [bill.goalTon, bill.collectedTon]);
+    const leftTon = Math.max(0, bill.goalTon - bill.collectedTon);
+    const url = useMemo(() => buildMiniAppLink("CryptoSplitBot", {bill}), [bill]);
 
     const [shareOpen, setShareOpen] = useState(false);
     const [payOpen, setPayOpen] = useState(false);
     const [amount, setAmount] = useState(0);
-    const { data: bal, isLoading: balLoading } = useTonBalance(wallet || undefined, network || undefined);
+    const {data: bal, isLoading: balLoading} = useTonBalance(wallet || undefined, network || undefined);
     const balanceText = balLoading ? "•••" : formatTon(bal?.tons ?? 0);
-    const transfer = useTonTransfer()
+    const transfer = useTonTransfer();
+    const contribute = useCreateTxMutation(bill.id, sender);
 
     // animation trigger: when user fills any positive amount
     const engaged = leftTon == 0; // измените при необходимости
@@ -332,15 +311,18 @@ export default function ProcessBill({
         try {
             const payload = buildContributePayload();
             await transfer.mutateAsync({
-                to: destAddress,
+                to: bill.destAddress,
                 amountTons: amount,
                 payload,
             });
 
-            setCollectedTon((v) => v + amount);
+            await contribute.mutateAsync({
+                amount,
+                op_type: "CONTRIBUTE",
+            });
+
             setPayOpen(false);
-        }
-        catch (e) {
+        } catch (e) {
             console.error("TON transfer failed", e);
         }
     }
@@ -402,15 +384,15 @@ export default function ProcessBill({
             <StatCard>
                 <StatRow>
                     <StatName>Collected</StatName>
-                    <StatValue>{formatTon(collectedTon)} TON</StatValue>
+                    <StatValue>{formatTon(bill.collectedTon)} TON</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Goal</StatName>
-                    <StatValue>{formatTon(goalTon)} TON</StatValue>
+                    <StatValue>{formatTon(bill.goalTon)} TON</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Receiver</StatName>
-                    <StatValue>{receiver}</StatValue>
+                    <StatValue>{bill.receiver}</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Left</StatName>
@@ -428,15 +410,15 @@ export default function ProcessBill({
                 </HistoryHeader>
                 <HistoryBodyOuter ref={bodyOuterRef} style={{height: bodyHeight, transition: "height 260ms ease"}}>
                     <HistoryBodyInner ref={bodyInnerRef}>
-                        {!history || history.length === 0 ? (
+                        {!bill.transactions || bill.transactions.length === 0 ? (
                             <HistoryEmpty>No transactions</HistoryEmpty>
                         ) : (
-                            history.map((h) => (
+                            bill.transactions.map((h) => (
                                 <HistoryItem key={h.id}>
                   <span>
-                    <strong>{formatTon(h.amountTon)} TON</strong> from {h.from}
+                    <strong>{formatTon(h.amount)} TON</strong> from {h.sender_address}
                   </span>
-                                    <span style={{opacity: 0.7}}>{new Date(h.atSec * 1000).toLocaleTimeString()}</span>
+                                    <span style={{opacity: 0.7}}>{new Date(h.created_at).toLocaleTimeString()}</span>
                                 </HistoryItem>
                             ))
                         )}
@@ -453,7 +435,7 @@ export default function ProcessBill({
             <PaySheet
                 open={payOpen}
                 onClose={() => setPayOpen(false)}
-                totalTon={goalTon}
+                totalTon={bill.goalTon}
                 amountTon={amount}
                 onChange={setAmount}
                 onPay={handlePay}
