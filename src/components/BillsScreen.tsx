@@ -1,11 +1,10 @@
-import React, {useState} from "react";
+import React from "react";
 import CreateBill from "./CreateBill";
 import ProcessBill from "./ProcessBill";
 import {useBillStore, OpenBill} from "../state/billStore";
 
 export default function BillsScreen() {
     const {bill, setBill, clearBill} = useBillStore();
-    const [collectedTon, setCollectedTon] = useState<number>(0);
 
     // колбэк, который должен вызвать CreateBill после создания сбора
     const handleCreated = (payload: OpenBill) => {
@@ -30,9 +29,10 @@ export default function BillsScreen() {
         <ProcessBill
             // у вас уже есть эти пропсы — просто прокидываем из bill
             receiver={bill.receiver}
+            destAddress={bill.destAddress}
             goalTon={bill.goalTon}
             endTimeSec={bill.endTimeSec}
-            collected={collectedTon}
+            collected={bill.collectedTon}
             // опционально: дайте способ выйти из открытого счёта
             onClose={handleClose}
         />

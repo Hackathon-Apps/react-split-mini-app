@@ -4,22 +4,15 @@ import {Button} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
-import { beginCell } from "@ton/core";
-import { useTonConnectUI } from "@tonconnect/ui-react";
-import { useTonConnect } from "../hooks/useTonConnect";
-import { CHAIN } from "@tonconnect/protocol";
+import {useTonConnect} from "../hooks/useTonConnect";
+import {useTonBalance, useTonTransfer} from "../api/queries";
+import {buildContributePayload, formatTon} from "../utils/ton";
 
-/**
- * BillDetails screen (updated, v2)
- * Fixes:
- * 1) Таймер и прогрессринг НЕ накладываются, пока сумма не введена. До этого они идут РЯДОМ.
- * 2) При вводе суммы ринг корректно становится зелёным.
- * 3) История разворачивается плавно без дёрганий (анимация высоты через измерение контента).
- */
 export type BillDetailsProps = {
     goalTon: number;
     collected: number;
     receiver: string;
+    destAddress: string;
     endTimeSec: number;
     serverNowSec?: number;
     history?: Array<{ id: string; from: string; amountTon: number; atSec: number }>;
@@ -32,182 +25,182 @@ const CONTRACT_ADDR = 'EQDthMBd5yXbGBZWKu9M1VyIRVYM0N_rY0wnjJ7xJUfoS1J-';
 
 // ========== styles ==========
 const Screen = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 120px; /* leave space for bottom bar */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 120px; /* leave space for bottom bar */
 `;
 
 const SummaryCard = styled.div`
-  display: grid;
-  justify-items: center;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
 `;
 
 const Row = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
 `;
 
 const Stage = styled.div`
-  position: relative;
-  width: 100%;
-  min-height: 220px; /* используется только в режиме наложения */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    min-height: 220px; /* используется только в режиме наложения */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 `;
 
 const stackCenter = css`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 `;
 
 const TimerBox = styled.div<{ hidden?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 10px;
-  border-radius: 12px;
-  background: transparent;
-  ${stackCenter};
-  transition: opacity 400ms ease, transform 400ms ease;
-  opacity: ${({hidden}) => (hidden ? 0 : 1)};
-  transform: ${({hidden}) => (hidden ? "translate(-50%, -50%) scale(0.98)" : "translate(-50%, -50%)")};
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 12px;
+    background: transparent;
+    ${stackCenter};
+    transition: opacity 400ms ease, transform 400ms ease;
+    opacity: ${({hidden}) => (hidden ? 0 : 1)};
+    transform: ${({hidden}) => (hidden ? "translate(-50%, -50%) scale(0.98)" : "translate(-50%, -50%)")};
 `;
 
 const TimeLeft = styled.div`
-  font-family: var(--fontSF);
-  font-weight: 450;
-  font-size: 45px;
-  letter-spacing: 0.3px;
+    font-family: var(--fontSF);
+    font-weight: 450;
+    font-size: 45px;
+    letter-spacing: 0.3px;
 `;
 
 const RingBox = styled.div<{ pop?: boolean }>`
-  ${stackCenter};
-  transition: transform 400ms ease;
-  transform: ${({pop}) => (pop ? "translate(-50%, -50%) scale(1.04)" : "translate(-50%, -50%)")};
+    ${stackCenter};
+    transition: transform 400ms ease;
+    transform: ${({pop}) => (pop ? "translate(-50%, -50%) scale(1.04)" : "translate(-50%, -50%)")};
 `;
 
 const Actions = styled.div<{ disabled?: boolean }>`
-  display: flex;
-  width: 100%;
-  gap: 8px;
-  opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
-  pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
+    pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
 `;
 
 const PrimaryAction = styled(Button)`
-  border-radius: 14px;
-  padding: 14px 20px;
-  font-size: 16px;
-  flex-grow: 2;
-  background-color: #2990ff !important;
-  color: #ffffff !important;
-  font-family: var(--fontSF) !important;
-  font-weight: 600 !important;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 16px;
+    flex-grow: 2;
+    background-color: #2990ff !important;
+    color: #ffffff !important;
+    font-family: var(--fontSF) !important;
+    font-weight: 600 !important;
 `;
 
 const IconBtn = styled.button<{ disabled?: boolean }>`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #2990ff;
-  color: #2990ff;
-  background: #2990ff;
-  opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
-  pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #2990ff;
+    color: #2990ff;
+    background: #2990ff;
+    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
+    pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
 `;
 
 const StatCard = styled.div`
-  border: 1px solid #3a3a3a;
-  border-radius: 16px;
-  overflow: hidden;
+    border: 1px solid #3a3a3a;
+    border-radius: 16px;
+    overflow: hidden;
 `;
 const StatRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid #2c2c2c;
-  }
+    &:not(:last-child) {
+        border-bottom: 1px solid #2c2c2c;
+    }
 `;
 const StatName = styled.span`
-  opacity: 0.8;
+    opacity: 0.8;
 `;
 const StatValue = styled.span`
-  font-weight: 700;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-weight: 700;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const HistoryCard = styled.div`
-  border: 1px solid #2c2c2c;
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
+    border: 1px solid #2c2c2c;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
 `;
 
 const HistoryHeader = styled.button<{ open?: boolean }>`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  color: inherit;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
 
-  & > span {
-    font-weight: 700;
-    font-size: 16px;
-  }
+    & > span {
+        font-weight: 700;
+        font-size: 16px;
+    }
 
-  & svg {
-    transition: transform 250ms ease;
-    transform: rotate(${({open}) => (open ? 180 : 0)}deg);
-  }
+    & svg {
+        transition: transform 250ms ease;
+        transform: rotate(${({open}) => (open ? 180 : 0)}deg);
+    }
 `;
 
 const HistoryBodyOuter = styled.div`
-  overflow: hidden;
+    overflow: hidden;
 `;
 
 const HistoryBodyInner = styled.div`
-  padding: 12px 14px;
+    padding: 12px 14px;
 `;
 
 const HistoryEmpty = styled.div`
-  opacity: 0.6;
-  text-align: center;
-  padding: 12px 0;
+    opacity: 0.6;
+    text-align: center;
+    padding: 12px 0;
 `;
 const HistoryItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
 
-  &:not(:last-child) {
-    border-bottom: 1px dashed #2c2c2c;
-  }
+    &:not(:last-child) {
+        border-bottom: 1px dashed #2c2c2c;
+    }
 `;
 
 // ========== utils ==========
@@ -217,8 +210,6 @@ const formatMMSS = (sec: number) => {
     const s = Math.max(0, Math.floor(sec % 60));
     return `${pad2(m)}:${pad2(s)}`;
 };
-
-const formatTon = (n: number) => n.toLocaleString(undefined, {minimumFractionDigits: 3, maximumFractionDigits: 3});
 
 // SVG progress ring
 function ProgressRing({value, color = "#2990ff"}: { value: number; color?: string }) {
@@ -291,13 +282,13 @@ export default function ProcessBill({
                                         goalTon,
                                         collected,
                                         receiver,
+                                        destAddress,
                                         endTimeSec,
                                         serverNowSec,
                                         history,
                                         onClose
                                     }: BillDetailsProps) {
-    const [tonConnectUI] = useTonConnectUI();
-    const { wallet, network } = useTonConnect();
+    const {wallet, network} = useTonConnect();
     const leftSec = useSyncedCountdown(endTimeSec, serverNowSec);
     const [collectedTon, setCollectedTon] = useState(collected)
 
@@ -308,7 +299,9 @@ export default function ProcessBill({
     const [shareOpen, setShareOpen] = useState(false);
     const [payOpen, setPayOpen] = useState(false);
     const [amount, setAmount] = useState(0);
-    const [balanceTon, setBalanceTon] = useState<string>("•••");
+    const { data: bal, isLoading: balLoading } = useTonBalance(wallet || undefined, network || undefined);
+    const balanceText = balLoading ? "•••" : formatTon(bal?.tons ?? 0);
+    const transfer = useTonTransfer()
 
     // animation trigger: when user fills any positive amount
     const engaged = leftTon == 0; // измените при необходимости
@@ -335,40 +328,22 @@ export default function ProcessBill({
         return () => window.removeEventListener("resize", measure);
     }, [historyOpen, history?.length]);
 
-    useEffect(() => {
-        let cancelled = false;
-        async function fetchBalance() {
-            if (!wallet) {
-                setBalanceTon("—");
-                return;
-            }
-            try {
-                const base = network === CHAIN.TESTNET
-                    ? "https://testnet.toncenter.com"
-                    : "https://toncenter.com";
-                const url = `${base}/api/v2/getAddressBalance?address=${encodeURIComponent(wallet)}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                let nanoStr: string | undefined = undefined;
-                if (typeof data?.result === 'string' || typeof data?.result === 'number') {
-                    nanoStr = String(data.result);
-                } else if (typeof data?.balance === 'string' || typeof data?.balance === 'number') {
-                    nanoStr = String(data.balance);
-                } else if (typeof data?.result?.balance === 'string' || typeof data?.result?.balance === 'number') {
-                    nanoStr = String(data.result.balance);
-                }
-                if (!nanoStr) throw new Error('Unexpected balance response');
-                const ton = Number(nanoStr) / 1e9;
-                const formatted = ton.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-                if (!cancelled) setBalanceTon(formatted);
-            } catch (e) {
-                if (!cancelled) setBalanceTon("…");
-                console.error('Failed to fetch TON balance', e);
-            }
+    const handlePay = async (amount: number) => {
+        try {
+            const payload = buildContributePayload();
+            await transfer.mutateAsync({
+                to: destAddress,
+                amountTons: amount,
+                payload,
+            });
+
+            setCollectedTon((v) => v + amount);
+            setPayOpen(false);
         }
-        fetchBalance();
-        return () => { cancelled = true };
-    }, [wallet, network]);
+        catch (e) {
+            console.error("TON transfer failed", e);
+        }
+    }
 
     return (
         <Screen>
@@ -481,31 +456,8 @@ export default function ProcessBill({
                 totalTon={goalTon}
                 amountTon={amount}
                 onChange={setAmount}
-                onPay={async (amount) => {
-                    try {
-                        const amountNano = Math.round(amount * 1e9).toString();
-                        // тело с опкодом CONTRIBUTE (можно убрать payload для пустого тела)
-                        const body = beginCell().storeUint(0x434F4E54, 32).endCell();
-                        const payloadBase64 = body.toBoc().toString('base64');
-
-                        await tonConnectUI.sendTransaction({
-                            validUntil: Math.floor(Date.now() / 1000) + 300,
-                            messages: [
-                                {
-                                    address: CONTRACT_ADDR,
-                                    amount: amountNano,
-                                    payload: payloadBase64,
-                                },
-                            ],
-                        });
-
-                        setCollectedTon((v) => v + amount);
-                        setPayOpen(false);
-                    } catch (e) {
-                        console.error('TON transfer failed', e);
-                    }
-                }}
-                balanceTon={balanceTon}
+                onPay={handlePay}
+                balanceTon={balanceText}
             />
         </Screen>
     );

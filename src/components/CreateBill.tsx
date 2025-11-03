@@ -3,10 +3,11 @@ import styled from "styled-components";
 import { Address } from "@ton/ton";
 import { Button } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
-import { useTonConnect } from "../hooks/useTonConnect";
-import { useTonClient } from "../hooks/useTonClient";
 import {OpenBill} from "../state/billStore";
 import {useUIState} from "../state/uiState";
+import {useTonAddress} from "@tonconnect/ui-react";
+import {useCreateBillMutation} from "../api/queries";
+import {toNano} from "@ton/core";
 
 const Screen = styled.div`
   display: flex;
@@ -163,9 +164,9 @@ const PrimaryAction = styled(Button)`
 export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => void}) {
   const [total, setTotal] = useState("");
   const [receiver, setReceiver] = useState("");
-  const { sender, connected } = useTonConnect();
-  const { client } = useTonClient();
+  const sender = useTonAddress();
   const { isEditing, isModalOpen } = useUIState();
+  const createBill = useCreateBillMutation(sender);
 
   const onScan = useCallback(() => {
     // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -218,15 +219,25 @@ export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => vo
       !!receiver &&
       !!total &&
       !totalInvalid &&
-      !receiverInvalid //&&
-      //connected &&
-      //!!client
+      !receiverInvalid// &&
+      //!!sender
     );
-  }, [receiver, total, connected, client]);
+  }, [receiver, total, sender]);
 
-  const handleCreate = () => {
-    //Ждем ответ с бэкэнда
-    onCreated({id: "123", receiver, goalTon: parseFloat(total), endTimeSec: Math.floor(Date.now() / 1000) + 600})
+  const handleCreate = async () => {
+    const res = await createBill.mutateAsync({
+        goal: toNano(total).toString(),
+        dest_address: receiver
+    })
+    onCreated({
+        id: res.id,
+        receiver,
+        destAddress: res.dest_address,
+        goalTon: parseFloat(total),
+        endTimeSec: Math.floor(Date.parse(res.created_at) / 1000) + 600,
+        collectedTon: res.collected,
+        status: res.status,
+    })
   }
 
   return (

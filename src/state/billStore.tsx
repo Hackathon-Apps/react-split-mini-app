@@ -1,10 +1,15 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
 
+export type BillStatus = "ACTIVE" | "COMPLETED" | "REFUNDED" | "CANCELLED";
+
 export type OpenBill = {
     id: string;
     receiver: string;
+    destAddress: string; //proxy
     goalTon: number;
     endTimeSec: number;
+    status: BillStatus;
+    collectedTon: number;
 };
 
 type BillCtx = {
