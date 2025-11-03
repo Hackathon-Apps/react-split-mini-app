@@ -10,7 +10,7 @@ async function request<T>(
     opts: RequestOpts = {}
 ): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (opts.sender) headers["sender_address"] = opts.sender;
+    if (opts.sender) headers["sender-address"] = opts.sender;
 
     const res = await fetch(`${BASE_URL}${path}`, {
         method,

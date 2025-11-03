@@ -23,10 +23,10 @@ export function useHistoryQuery(sender: string) {
 }
 
 // --- Mutations ---
-export function useCreateBillMutation(sender: string) {
+export function useCreateBillMutation() {
     return useMutation({
-        mutationFn: (payload: { goal: string; destination_address: string }) =>
-            http.post<Bill>("/bills", payload, { sender }),
+        mutationFn: (payload: { goal: string; destination_address: string; sender: string }) =>
+            http.post<Bill>("/bills", payload, { sender: payload.sender }),
     });
 }
 

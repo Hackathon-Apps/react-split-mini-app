@@ -165,7 +165,7 @@ export function CreateBill({ onCreated }: { onCreated: (bill: {id: string}) => v
   const [receiver, setReceiver] = useState("");
   const sender = useTonAddress();
   const { isEditing, isModalOpen } = useUIState();
-  const createBill = useCreateBillMutation(sender);
+  const createBill = useCreateBillMutation();
 
   const onScan = useCallback(() => {
     // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -226,7 +226,8 @@ export function CreateBill({ onCreated }: { onCreated: (bill: {id: string}) => v
   const handleCreate = async () => {
     const res = await createBill.mutateAsync({
         goal: toNano(total).toString(),
-        destination_address: receiver
+        destination_address: receiver,
+        sender
     })
     onCreated({
         id: res.id
