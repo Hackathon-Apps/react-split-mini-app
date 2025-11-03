@@ -3,14 +3,14 @@ import { TonConnectButton } from "@tonconnect/ui-react";
 import styled from "styled-components";
 import "@twa-dev/sdk";
 import BottomTabBar, { TabKey } from "./components/BottomTabBar";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useRef} from "react";
 import HistoryScreen from "./components/HistoryScreen";
-import {scanQR} from "./utils/scanQR";
 import WebApp from "@twa-dev/sdk";
-import {OpenBill, useBillStore} from "./state/billStore";
 import BillsScreen from "./components/BillsScreen";
 import {UIStateProvider} from "./state/uiState";
 import {readStartPayload} from "./utils/deeplink";
+import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
+import JoinScreen from "./components/JoinScreen";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -33,73 +33,74 @@ const HeaderRow = styled.div`
   margin: 12px 0 24px;
 `;
 
-function App() {
-  const [tab, setTab] = useState<TabKey>(() => {
-    const raw = window.location.hash.replace("#", "");
-    const candidate = (raw || "bills") as TabKey;
-    const valid: TabKey[] = ["bills", "join", "history"];
-    return valid.includes(candidate) ? candidate : "bills";
-  });
-    const handledRef = useRef(false); // защита от повторов (HMR/ремонтовка)
-    const {setBill} = useBillStore();
-    // keep URL hash in sync so it persists after reload
-  useEffect(() => {
-    window.location.hash = tab;
-  }, [tab]);
+function RootLayout() {
+    const navigate = useNavigate();
+    const routerLocation = useLocation();
 
-  const Screen = useMemo(() => {
-    switch (tab) {
-      case "history":
-        return <HistoryScreen />;
-      default:
-        return <BillsScreen/>;
-    }
-  }, [tab]);
+    // активный таб берём из пути
+    const activeTab: TabKey = useMemo(() => {
+        if (routerLocation.pathname.startsWith("/history")) return "history";
+        if (routerLocation.pathname.startsWith("/join")) return "join";
+        return "bills";
+    }, [routerLocation.pathname]);
 
-  useEffect(() => {
-    if (tab == "join") {
-      scanQR((link) => {
-        WebApp.openTelegramLink(link)
-      })
-    }
-  }, [tab]);
-
-
+    const handledRef = useRef(false);
     useEffect(() => {
         if (handledRef.current) return;
         handledRef.current = true;
 
-        // Telegram WebApp готов к работе
         WebApp.ready();
 
-        // 1) читаем параметр из initDataUnsafe / ?tgWebAppStartParam=
-        const payload = readStartPayload<OpenBill>();
-        if (!payload) return;
+        // читаем диплинк-пейлоад при старте
+        const payload = readStartPayload<{ billId?: string; amount?: number }>();
+        if (payload?.billId) {
+            const q = payload.amount ? `?amount=${payload.amount}` : "";
+            navigate(`/bills/${payload.billId}${q}`, { replace: true });
+        }
 
-        console.log(payload);
-        setBill(payload);
-
+        // чистим ?tgWebAppStartParam, чтобы при F5 не повторялся старт
         const url = new URL(location.href);
         url.searchParams.delete("tgWebAppStartParam");
         history.replaceState({}, "", url);
-    }, []);
+    }, [navigate]);
 
-  return (
+    return (
         <UIStateProvider>
-          <StyledApp>
-            <AppContainer>
-              <HeaderRow>
-                <TonConnectButton />
-              </HeaderRow>
-              {Screen}
-            </AppContainer>
-            <BottomTabBar
-                active={tab}
-                onChange={setTab}
-            />
-          </StyledApp>
+            <StyledApp>
+                <AppContainer>
+                    <HeaderRow>
+                        <TonConnectButton />
+                    </HeaderRow>
+
+                    {/* сюда рендерятся экраны */}
+                    <Outlet />
+                </AppContainer>
+
+                <BottomTabBar
+                    active={activeTab}
+                    onChange={(tab) => {
+                        // навигация вкладок
+                        if (tab === "bills") navigate("/bills");
+                        if (tab === "join") navigate("/join");
+                        if (tab === "history") navigate("/history");
+                    }}
+                />
+            </StyledApp>
         </UIStateProvider>
-  );
+    );
 }
 
-export default App;
+export default function App() {
+    return (
+        <Routes>
+            <Route element={<RootLayout />}>
+                <Route index element={<Navigate to="/bills" replace />} />
+                <Route path="/bills" element={<BillsScreen />} />
+                <Route path="/bills/:id" element={<BillsScreen />} />
+                <Route path="/join" element={<JoinScreen />} />
+                <Route path="/history" element={<HistoryScreen />} />
+                <Route path="*" element={<Navigate to="/bills" replace />} />
+            </Route>
+        </Routes>
+    );
+}

@@ -7,11 +7,11 @@ import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
 import {useCreateTxMutation, useTonBalance, useTonTransfer} from "../api/queries";
 import {buildContributePayload, formatTon} from "../utils/ton";
-import {OpenBill} from "../state/billStore";
+import {Bill} from "../api/types";
 import {useTonAddress} from "@tonconnect/ui-react";
 
 export type BillDetailsProps = {
-    bill: OpenBill
+    bill: Bill
     onClose?: () => void
 };
 
@@ -268,10 +268,10 @@ export default function ProcessBill({
                                     }: BillDetailsProps) {
     const {wallet, network} = useTonConnect();
     const sender = useTonAddress();
-    const leftSec = useSyncedCountdown(bill.endTimeSec);
+    const leftSec = useSyncedCountdown(  Date.parse(bill.created_at) / 1000 + 600 );
 
-    const percent = useMemo(() => (bill.goalTon <= 0 ? 0 : (bill.collectedTon / bill.goalTon) * 100), [bill.goalTon, bill.collectedTon]);
-    const leftTon = Math.max(0, bill.goalTon - bill.collectedTon);
+    const percent = useMemo(() => (bill.goal <= 0 ? 0 : (bill.collected / bill.goal) * 100), [bill.goal, bill.collected]);
+    const leftTon = Math.max(0, bill.goal - bill.collected);
     const url = useMemo(() => buildMiniAppLink("CryptoSplitBot", {bill}), [bill]);
 
     const [shareOpen, setShareOpen] = useState(false);
@@ -311,7 +311,7 @@ export default function ProcessBill({
         try {
             const payload = buildContributePayload();
             await transfer.mutateAsync({
-                to: bill.destAddress,
+                to: bill.proxy_wallet_address,
                 amountTons: amount,
                 payload,
             });
@@ -384,15 +384,15 @@ export default function ProcessBill({
             <StatCard>
                 <StatRow>
                     <StatName>Collected</StatName>
-                    <StatValue>{formatTon(bill.collectedTon)} TON</StatValue>
+                    <StatValue>{formatTon(bill.collected)} TON</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Goal</StatName>
-                    <StatValue>{formatTon(bill.goalTon)} TON</StatValue>
+                    <StatValue>{formatTon(bill.goal)} TON</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Receiver</StatName>
-                    <StatValue>{bill.receiver}</StatValue>
+                    <StatValue>{bill.destination_address}</StatValue>
                 </StatRow>
                 <StatRow>
                     <StatName>Left</StatName>
@@ -435,7 +435,7 @@ export default function ProcessBill({
             <PaySheet
                 open={payOpen}
                 onClose={() => setPayOpen(false)}
-                totalTon={bill.goalTon}
+                totalTon={bill.goal}
                 amountTon={amount}
                 onChange={setAmount}
                 onPay={handlePay}

@@ -6,7 +6,7 @@ import {toncenterBase} from "../utils/ton";
 import {Cell, fromNano, toNano} from "@ton/core";
 
 // --- Queries ---
-export function useBillQuery(id: string, sender: string) {
+export function useBillQuery(id: string, sender?: string) {
     return useQuery({
         queryKey: qk.bill(id, sender),
         queryFn: ({ signal }) => http.get<Bill>(`/bills/${id}`, { sender, signal }),
@@ -25,7 +25,7 @@ export function useHistoryQuery(sender: string) {
 // --- Mutations ---
 export function useCreateBillMutation(sender: string) {
     return useMutation({
-        mutationFn: (payload: { goal: string; dest_address: string }) =>
+        mutationFn: (payload: { goal: string; destination_address: string }) =>
             http.post<Bill>("/bills", payload, { sender }),
     });
 }

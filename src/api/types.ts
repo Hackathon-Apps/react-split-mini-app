@@ -1,5 +1,4 @@
-import {BillStatus} from "../state/billStore";
-
+export type BillStatus = "ACTIVE" | "COMPLETED" | "REFUNDED" | "CANCELLED";
 
 export interface Bill {
     id: string;

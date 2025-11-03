@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Address } from "@ton/ton";
 import { Button } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
-import {OpenBill} from "../state/billStore";
 import {useUIState} from "../state/uiState";
 import {useTonAddress} from "@tonconnect/ui-react";
 import {useCreateBillMutation} from "../api/queries";
@@ -20,7 +19,7 @@ const Screen = styled.div`
 `;
 
 const Field = styled.fieldset<{ invalid?: boolean }>`
-  margin: 0;
+  margin: 5px 20px;
   padding: 6px 12px 10px;
   border-radius: 20px;
   border: 1px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--stroke)")};
@@ -33,7 +32,7 @@ const Legend = styled.legend`
   opacity: 0.9;
   font-weight: 600;
   font-size: 15px;
-  font-family: var(--fontRoboto);
+  font-family: var(--fontRoboto),serif;
   line-height: 1;
   margin-left: 4px;
   margin-bottom: -4px; /* tighten gap to input */
@@ -68,7 +67,7 @@ const Input = styled.input`
   &::placeholder {
     color: #888;
     opacity: 1;
-    font-family: var(--fontRoboto);
+    font-family: var(--fontRoboto),serif;
     font-weight: 600;
     font-size: 16px;
   }
@@ -104,7 +103,7 @@ const PasteButton = styled.button`
   background: transparent;
   color: #2990FF;
   font-weight: 600;
-  font-family: var(--fontSF);
+  font-family: var(--fontSF),serif;
   font-size: 16px;
   cursor: pointer;
   padding: 0 6px;
@@ -153,7 +152,7 @@ const PrimaryAction = styled(Button)`
   font-size: 16px;
   background-color: #2990FF !important;
   color: #FFFFFF !important;
-  font-family: var(--fontSF) !important;
+  font-family: var(--fontSF),serif !important;
   font-weight: 600 !important;
   &:disabled {
     opacity: 0.6;
@@ -161,7 +160,7 @@ const PrimaryAction = styled(Button)`
   }
 `;
 
-export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => void}) {
+export function CreateBill({ onCreated }: { onCreated: (bill: {id: string}) => void}) {
   const [total, setTotal] = useState("");
   const [receiver, setReceiver] = useState("");
   const sender = useTonAddress();
@@ -227,17 +226,10 @@ export function CreateBill({ onCreated }: { onCreated: (payload: OpenBill) => vo
   const handleCreate = async () => {
     const res = await createBill.mutateAsync({
         goal: toNano(total).toString(),
-        dest_address: receiver
+        destination_address: receiver
     })
     onCreated({
-        id: res.id,
-        receiver: res.destination_address,
-        destAddress: res.proxy_wallet_address,
-        goalTon: parseFloat(total),
-        endTimeSec: Math.floor(Date.parse(res.created_at) / 1000) + 600,
-        collectedTon: res.collected,
-        status: res.status,
-        transactions: res.transactions,
+        id: res.id
     })
   }
 
