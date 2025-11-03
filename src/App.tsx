@@ -6,11 +6,12 @@ import BottomTabBar, { TabKey } from "./components/BottomTabBar";
 import {useEffect, useMemo, useRef} from "react";
 import HistoryScreen from "./components/HistoryScreen";
 import WebApp from "@twa-dev/sdk";
-import BillsScreen from "./components/BillsScreen";
 import {UIStateProvider} from "./state/uiState";
 import {readStartPayload} from "./utils/deeplink";
 import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import JoinScreen from "./components/JoinScreen";
+import CreateBill from "./components/CreateBill";
+import ProcessBill from "./components/ProcessBill";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -59,9 +60,9 @@ function RootLayout() {
         }
 
         // чистим ?tgWebAppStartParam, чтобы при F5 не повторялся старт
-        const url = new URL(location.href);
+        const url = new URL(window.location.href);
         url.searchParams.delete("tgWebAppStartParam");
-        history.replaceState({}, "", url);
+        window.history.replaceState({}, "", url);
     }, [navigate]);
 
     return (
@@ -95,8 +96,8 @@ export default function App() {
         <Routes>
             <Route element={<RootLayout />}>
                 <Route index element={<Navigate to="/bills" replace />} />
-                <Route path="/bills" element={<BillsScreen />} />
-                <Route path="/bills/:id" element={<BillsScreen />} />
+                <Route path="/bills" element={<CreateBill />} />
+                <Route path="/bills/:id" element={<ProcessBill />} />
                 <Route path="/join" element={<JoinScreen />} />
                 <Route path="/history" element={<HistoryScreen />} />
                 <Route path="*" element={<Navigate to="/bills" replace />} />

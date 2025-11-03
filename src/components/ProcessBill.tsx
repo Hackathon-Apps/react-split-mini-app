@@ -5,15 +5,10 @@ import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
-import {useCreateTxMutation, useTonBalance, useTonTransfer} from "../api/queries";
+import {useBillQuery, useCreateTxMutation, useTonBalance, useTonTransfer} from "../api/queries";
 import {buildContributePayload, formatTon} from "../utils/ton";
-import {Bill} from "../api/types";
 import {useTonAddress} from "@tonconnect/ui-react";
-
-export type BillDetailsProps = {
-    bill: Bill
-    onClose?: () => void
-};
+import {useNavigate, useParams} from "react-router-dom";
 
 // ========== styles ==========
 const Screen = styled.div`
@@ -188,6 +183,7 @@ const HistoryItem = styled.div`
 `;
 
 // ========== utils ==========
+const LAST_BILL_KEY = "lastBillId";
 const pad2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
 const formatMMSS = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -262,10 +258,25 @@ function useSyncedCountdown(endTimeSec: number, serverNowSec?: number, resyncEve
 }
 
 // ========== component ==========
-export default function ProcessBill({
-                                        bill,
-                                        onClose
-                                    }: BillDetailsProps) {
+export default function ProcessBill() {
+    const navigate = useNavigate();
+    const {id} = useParams<{id: string}>()
+    // если пришли без id — назад на создание
+    if (!id) {
+        navigate("/bills", { replace: true });
+        return null;
+    }
+    // запомним последний открытый счёт
+    useEffect(() => {
+        localStorage.setItem(LAST_BILL_KEY, id);
+    }, [id]);
+
+    const {data: bill, isLoading} = useBillQuery(id)
+    if (isLoading) return <div>Loading…</div>;
+    if (!bill) {
+        localStorage.removeItem(LAST_BILL_KEY);
+        return <div>Bill not found</div>;
+    }
     const {wallet, network} = useTonConnect();
     const sender = useTonAddress();
     const leftSec = useSyncedCountdown(  Date.parse(bill.created_at) / 1000 + 600 );
@@ -293,7 +304,8 @@ export default function ProcessBill({
 
     useEffect(() => {
         if (leftSec == 0) {
-            onClose?.()
+            localStorage.removeItem(LAST_BILL_KEY);
+            navigate("/bills", { replace: true });
         }
     }, [leftSec]);
 
