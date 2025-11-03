@@ -4,6 +4,10 @@ import {Button} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
+import { beginCell } from "@ton/core";
+import { useTonConnectUI } from "@tonconnect/ui-react";
+import { useTonConnect } from "../hooks/useTonConnect";
+import { CHAIN } from "@tonconnect/protocol";
 
 /**
  * BillDetails screen (updated, v2)
@@ -21,6 +25,10 @@ export type BillDetailsProps = {
     history?: Array<{ id: string; from: string; amountTon: number; atSec: number }>;
     onClose?: () => void
 };
+
+// адрес контракта для приема средств
+// TODO replace
+const CONTRACT_ADDR = 'EQDthMBd5yXbGBZWKu9M1VyIRVYM0N_rY0wnjJ7xJUfoS1J-';
 
 // ========== styles ==========
 const Screen = styled.div`
@@ -288,6 +296,8 @@ export default function ProcessBill({
                                         history,
                                         onClose
                                     }: BillDetailsProps) {
+    const [tonConnectUI] = useTonConnectUI();
+    const { wallet, network } = useTonConnect();
     const leftSec = useSyncedCountdown(endTimeSec, serverNowSec);
     const [collectedTon, setCollectedTon] = useState(collected)
 
@@ -298,6 +308,7 @@ export default function ProcessBill({
     const [shareOpen, setShareOpen] = useState(false);
     const [payOpen, setPayOpen] = useState(false);
     const [amount, setAmount] = useState(0);
+    const [balanceTon, setBalanceTon] = useState<string>("•••");
 
     // animation trigger: when user fills any positive amount
     const engaged = leftTon == 0; // измените при необходимости
@@ -323,6 +334,41 @@ export default function ProcessBill({
         window.addEventListener("resize", measure);
         return () => window.removeEventListener("resize", measure);
     }, [historyOpen, history?.length]);
+
+    useEffect(() => {
+        let cancelled = false;
+        async function fetchBalance() {
+            if (!wallet) {
+                setBalanceTon("—");
+                return;
+            }
+            try {
+                const base = network === CHAIN.TESTNET
+                    ? "https://testnet.toncenter.com"
+                    : "https://toncenter.com";
+                const url = `${base}/api/v2/getAddressBalance?address=${encodeURIComponent(wallet)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                let nanoStr: string | undefined = undefined;
+                if (typeof data?.result === 'string' || typeof data?.result === 'number') {
+                    nanoStr = String(data.result);
+                } else if (typeof data?.balance === 'string' || typeof data?.balance === 'number') {
+                    nanoStr = String(data.balance);
+                } else if (typeof data?.result?.balance === 'string' || typeof data?.result?.balance === 'number') {
+                    nanoStr = String(data.result.balance);
+                }
+                if (!nanoStr) throw new Error('Unexpected balance response');
+                const ton = Number(nanoStr) / 1e9;
+                const formatted = ton.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+                if (!cancelled) setBalanceTon(formatted);
+            } catch (e) {
+                if (!cancelled) setBalanceTon("…");
+                console.error('Failed to fetch TON balance', e);
+            }
+        }
+        fetchBalance();
+        return () => { cancelled = true };
+    }, [wallet, network]);
 
     return (
         <Screen>
@@ -435,10 +481,31 @@ export default function ProcessBill({
                 totalTon={goalTon}
                 amountTon={amount}
                 onChange={setAmount}
-                onPay={(amount) => {/* TonConnect send */
-                    setCollectedTon(collectedTon + amount)
+                onPay={async (amount) => {
+                    try {
+                        const amountNano = Math.round(amount * 1e9).toString();
+                        // тело с опкодом CONTRIBUTE (можно убрать payload для пустого тела)
+                        const body = beginCell().storeUint(0x434F4E54, 32).endCell();
+                        const payloadBase64 = body.toBoc().toString('base64');
+
+                        await tonConnectUI.sendTransaction({
+                            validUntil: Math.floor(Date.now() / 1000) + 300,
+                            messages: [
+                                {
+                                    address: CONTRACT_ADDR,
+                                    amount: amountNano,
+                                    payload: payloadBase64,
+                                },
+                            ],
+                        });
+
+                        setCollectedTon((v) => v + amount);
+                        setPayOpen(false);
+                    } catch (e) {
+                        console.error('TON transfer failed', e);
+                    }
                 }}
-                balanceTon={"•••"}
+                balanceTon={balanceTon}
             />
         </Screen>
     );
