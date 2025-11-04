@@ -2487,7 +2487,7 @@ fs.realpath@^1.0.0:
 
 fsevents@^2.3.3, fsevents@~2.3.2:
   version "2.3.3"
-  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
+  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.1, function-bind@^1.1.2:
@@ -3344,7 +3344,7 @@ jest@^30.0.5:
 
 js-base64@^3.7.8:
   version "3.7.8"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.8.tgz#af44496bc09fa178ed9c4adf67eb2b46f5c6d2a4"
+  resolved "https://registry.npmjs.org/js-base64/-/js-base64-3.7.8.tgz"
   integrity sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:

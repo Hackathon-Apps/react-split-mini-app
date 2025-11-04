@@ -30,7 +30,7 @@ export interface TxPayload {
 
 export interface HistoryItem {
     bill_id: string;
-    dest_address: string;
+    destination_address: string;
     total_amount: string;  // nanoton
     created_at?: string;
 }
