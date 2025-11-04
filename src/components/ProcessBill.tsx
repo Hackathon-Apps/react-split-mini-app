@@ -67,8 +67,6 @@ const IconBtn = styled.button<{ disabled?: boolean }>`
     pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
 `;
 
-const LAST_BILL_KEY = "lastBillId";
-
 export default function ProcessBill() {
     const navigate = useNavigate();
     const {id} = useParams<{ id?: string, created_at: string }>();
@@ -105,17 +103,6 @@ export default function ProcessBill() {
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender)
 
     const engaged = bill ? leftTon === 0 || leftSec == 0 : false;
-
-    useEffect(() => {
-        if (!bill) return;
-        localStorage.setItem(LAST_BILL_KEY, bill.id);
-    }, [bill?.id]);
-
-    useEffect(() => {
-        if (leftSec == 0) {
-            localStorage.removeItem(LAST_BILL_KEY);
-        }
-    }, [leftSec]);
 
     const handlePay = async (amount: number) => {
         try {
