@@ -9,6 +9,7 @@ export interface Bill {
     created_at: string;
     status: BillStatus;
     proxy_wallet: string;
+    state_init_hash: string;
     transactions?: Transaction[];
 }
 

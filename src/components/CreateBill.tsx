@@ -240,7 +240,7 @@ export function CreateBill() {
 
     const handleCreate = async () => {
         const res = await createBill.mutateAsync({
-            goal: toNano(total).toString(),
+            goal: Number(toNano(total)),
             destination_address: receiver,
             sender,
         });

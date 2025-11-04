@@ -10,9 +10,7 @@ export function toncenterBase(chain?: CHAIN) {
     return chain === CHAIN.TESTNET ? "https://testnet.toncenter.com" : "https://toncenter.com";
 }
 
-/** Payload для опкода CONTRIBUTE (0x434F4E54, "CONT") */
 export function buildContributePayload(extra?: (cell: import("@ton/core").Builder) => void): Cell {
-    const b = beginCell().storeUint(0x434F4E54, 32);
-    if (extra) extra(b);
+    const b = beginCell();
     return b.endCell();
 }
