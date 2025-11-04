@@ -239,13 +239,18 @@ export function CreateBill() {
     }, [receiver, total, sender]);
 
     const handleCreate = async () => {
-        const res = await createBill.mutateAsync({
-            goal: Number(toNano(total)),
-            destination_address: receiver,
-            sender,
-        });
-        localStorage.setItem(LAST_BILL_KEY, res.id);
-        navigate(`/bills/${res.id}`, {replace: true});
+        try {
+            const res = await createBill.mutateAsync({
+                goal: Number(toNano(total)),
+                destination_address: receiver,
+                sender,
+            });
+            localStorage.setItem(LAST_BILL_KEY, res.id);
+            navigate(`/bills/${res.id}`, {replace: true});
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
     return (
