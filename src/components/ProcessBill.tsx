@@ -235,6 +235,7 @@ export default function ProcessBill() {
                 to: bill.proxy_wallet,
                 amountTons: amount,
                 payload,
+                stateInitBase64: bill.state_init_hash,
             });
 
             await contribute.mutateAsync({amount, op_type: "CONTRIBUTE"});

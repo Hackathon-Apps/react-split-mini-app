@@ -25,7 +25,7 @@ export function useHistoryQuery(sender: string) {
 // --- Mutations ---
 export function useCreateBillMutation() {
     return useMutation({
-        mutationFn: (payload: { goal: string; destination_address: string; sender: string }) =>
+        mutationFn: (payload: { goal: number; destination_address: string; sender: string }) =>
             http.post<Bill>("/bills", payload, { sender: payload.sender }),
     });
 }
@@ -92,6 +92,7 @@ type TransferArgs = {
     to: string;              // адрес получателя (EQ.../UQ...)
     amountTons: number;      // сумма в ТОN
     payload?: Cell | string; // payload как Cell или base64 BOC
+    stateInitBase64?: string;
     validForSec?: number;    // TTL, по умолчанию 300
 };
 
@@ -100,14 +101,14 @@ export function useTonTransfer() {
     const [tonConnectUI] = useTonConnectUI();
 
     return useMutation({
-        mutationFn: async ({ to, amountTons, payload, validForSec = 300 }: TransferArgs) => {
+        mutationFn: async ({ to, amountTons, payload, stateInitBase64, validForSec = 300 }: TransferArgs) => {
             const amount = toNano(amountTons).toString();
             const payloadBase64 =
                 typeof payload === "string" ? payload : payload ? payload.toBoc().toString("base64") : undefined;
 
             return await tonConnectUI.sendTransaction({
                 validUntil: Math.floor(Date.now() / 1000) + validForSec,
-                messages: [{address: to, amount, payload: payloadBase64}],
+                messages: [{address: to, amount, payload: payloadBase64, stateInit: stateInitBase64}],
             });
         },
     });
