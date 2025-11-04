@@ -78,7 +78,7 @@ export default function PaySheet({
     amountTon: number;
     onChange: (v: number) => void;
     onPay: (amount: number) => void;
-    totalTon: number;       // проценты считаются от общей суммы счёта
+    totalTon: number;
     balanceTon?: string;
     clampToTotal?: boolean;
 }) {

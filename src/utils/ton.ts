@@ -1,8 +1,8 @@
 import {CHAIN} from "@tonconnect/protocol";
-import {beginCell, Cell} from "@ton/core";
+import {beginCell, Cell, fromNano} from "@ton/core";
 
-export function formatTon(n: number, fd: number = 3) {
-    return n.toLocaleString(undefined, { minimumFractionDigits: fd, maximumFractionDigits: fd });
+export function formatTon(n: number | string, fd: number = 3) {
+    return Number(fromNano(n)).toLocaleString(undefined, { minimumFractionDigits: fd, maximumFractionDigits: fd });
 }
 
 export function toncenterBase(chain?: CHAIN) {
