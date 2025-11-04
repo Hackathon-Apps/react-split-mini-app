@@ -12,6 +12,7 @@ import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-r
 import JoinScreen from "./components/JoinScreen";
 import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
+import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -38,7 +39,6 @@ function RootLayout() {
     const navigate = useNavigate();
     const routerLocation = useLocation();
 
-    // активный таб берём из пути
     const activeTab: TabKey = useMemo(() => {
         if (routerLocation.pathname.startsWith("/history")) return "history";
         if (routerLocation.pathname.startsWith("/join")) return "join";
@@ -53,10 +53,10 @@ function RootLayout() {
         WebApp.ready();
 
         // читаем диплинк-пейлоад при старте
-        const payload = readStartPayload<{ billId?: string; amount?: number }>();
-        if (payload?.billId) {
-            const q = payload.amount ? `?amount=${payload.amount}` : "";
-            navigate(`/bills/${payload.billId}${q}`, { replace: true });
+        const payload = readStartPayload<{ id: string; created_at: number }>();
+        if (payload) {
+            const q = payload.created_at ? `?created_at=${payload.created_at}` : "";
+            navigate(`/bills/${payload.id}${q}`, { replace: true });
         }
 
         // чистим ?tgWebAppStartParam, чтобы при F5 не повторялся старт
@@ -99,6 +99,7 @@ export default function App() {
                 <Route path="/bills" element={<CreateBill />} />
                 <Route path="/bills/:id" element={<ProcessBill />} />
                 <Route path="/join" element={<JoinScreen />} />
+                <Route path="/join/timeout" element={<JoinTimeOutScreen />} />
                 <Route path="/history" element={<HistoryScreen />} />
                 <Route path="*" element={<Navigate to="/bills" replace />} />
             </Route>
