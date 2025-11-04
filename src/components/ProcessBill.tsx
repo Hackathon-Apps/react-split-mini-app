@@ -7,7 +7,7 @@ import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
 import {useBillQuery, useTonBalance} from "../api/queries";
 import {formatTon} from "../utils/ton";
-import {useTonAddress} from "@tonconnect/ui-react";
+import {useTonAddress, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {fromNano} from "@ton/core";
 import BillTransactions from "./ui/BillTransactions";
@@ -69,6 +69,19 @@ const IconBtn = styled.button<{ disabled?: boolean }>`
 
 const LAST_BILL_KEY = "lastBillId";
 
+function useEnsureTelegramWallet() {
+  const [ui] = useTonConnectUI();
+  const wallet = useTonWallet();
+
+  return async () => {
+    const app = wallet?.device.appName ?? ui.wallet?.device?.appName ?? "Split Bill app";
+    const isTG = app === 'tonwallet' || app === 'tonspace';
+    if (!isTG) {
+      await ui.openSingleWalletModal('tonwallet');
+    }
+  };
+}
+
 export default function ProcessBill() {
     const navigate = useNavigate();
     const {id} = useParams<{ id?: string, created_at: string }>();
@@ -117,9 +130,11 @@ export default function ProcessBill() {
         }
     }, [leftSec]);
 
+    const ensureTGWallet = useEnsureTelegramWallet();
     const handlePay = async (amount: number) => {
         try {
             await contribute(amount);
+            await ensureTGWallet();
             setPayOpen(false);
         } catch (e) {
             console.error("TON transfer failed", e);
