@@ -8,7 +8,7 @@ export interface Bill {
     destination_address: string;
     created_at: string;
     status: BillStatus;
-    proxy_wallet_address: string;
+    proxy_wallet: string;
     transactions?: Transaction[];
 }
 

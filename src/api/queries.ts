@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {CHAIN, useTonConnectUI} from "@tonconnect/ui-react";
+import {CHAIN, SendTransactionResponse, useTonConnectUI} from "@tonconnect/ui-react";
 import {http} from "./http";
 import {Bill, HistoryItem, qk, TxPayload} from "./types";
 import {toncenterBase} from "../utils/ton";
