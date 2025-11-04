@@ -164,6 +164,8 @@ const PrimaryAction = styled(Button)`
     }
 `;
 
+const LAST_BILL_KEY = "lastBillId";
+
 export function CreateBill() {
     const [total, setTotal] = useState("");
     const [receiver, setReceiver] = useState("");
@@ -171,6 +173,11 @@ export function CreateBill() {
     const {isEditing, isModalOpen} = useUIState();
     const createBill = useCreateBillMutation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const last = localStorage.getItem(LAST_BILL_KEY);
+        if (last) navigate(`/bills/${last}`, { replace: true });
+    }, [navigate]);
 
     const onScan = useCallback(() => {
         // Telegram WebApp QR scanner. Fallback: prompt paste
@@ -237,6 +244,7 @@ export function CreateBill() {
                 destination_address: receiver,
                 sender,
             });
+            localStorage.setItem(LAST_BILL_KEY, res.id);
             navigate(`/bills/${res.id}`, {replace: true});
         }
         catch (e) {
