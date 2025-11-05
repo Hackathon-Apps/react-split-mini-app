@@ -6,7 +6,7 @@ import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
 import {useBillQuery, useTonBalance} from "../api/queries";
-import {formatTon} from "../utils/ton";
+import {formatAddress, formatTon} from "../utils/ton";
 import {useTonAddress, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {fromNano} from "@ton/core";
@@ -54,8 +54,8 @@ const PrimaryAction = styled(Button)`
 `;
 
 const IconBtn = styled.button<{ disabled?: boolean }>`
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -63,7 +63,6 @@ const IconBtn = styled.button<{ disabled?: boolean }>`
     border: 1px solid #2990ff;
     color: #2990ff;
     background: #2990ff;
-    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
     pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
 `;
 
@@ -117,7 +116,7 @@ export default function ProcessBill() {
 
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender)
 
-    const engaged = bill ? leftTon === 0 || leftSec == 0 : false;
+    const closed = bill ? leftTon === 0 || leftSec == 0 : false;
 
     useEffect(() => {
         if (!bill) return;
@@ -146,16 +145,16 @@ export default function ProcessBill() {
     return (
         <Screen>
             <SummaryCard>
-                <BillHero percent={percent} leftSec={leftSec} engaged={engaged} />
-                <Actions disabled={engaged}>
-                    <PrimaryAction onClick={() => setPayOpen(true)} disabled={engaged}>Contribute</PrimaryAction>
-                    <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={engaged}>
+                <BillHero percent={percent} leftSec={leftSec} closed={closed} />
+                <Actions disabled={closed}>
+                    <PrimaryAction onClick={() => setPayOpen(true)} disabled={closed}>Contribute</PrimaryAction>
+                    <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
                         <img src="/share.svg" width="20" height="20" alt="Share"/>
                     </IconBtn>
                 </Actions>
             </SummaryCard>
 
-            <BillStats collected={bill.collected} goal={bill.goal} receiver={bill.destination_address} left={leftTon}/>
+            <BillStats collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} left={leftTon}/>
 
             <BillTransactions transactions={bill.transactions} />
 

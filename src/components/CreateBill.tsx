@@ -174,6 +174,7 @@ export function CreateBill() {
     const createBill = useCreateBillMutation();
     const navigate = useNavigate();
 
+    // восстановить последний id, если есть
     useEffect(() => {
         const last = localStorage.getItem(LAST_BILL_KEY);
         if (last) navigate(`/bills/${last}`, { replace: true });

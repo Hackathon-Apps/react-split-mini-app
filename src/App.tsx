@@ -32,7 +32,7 @@ const HeaderRow = styled.div`
   justify-content: center;
   gap: 12px;
   /* tighten spacing so Connect button remains visible without scroll */
-  margin: 12px 0 24px;
+  margin: 12px 0 12px;
 `;
 
 function RootLayout() {
