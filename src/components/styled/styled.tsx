@@ -17,7 +17,6 @@ export const Card = styled.div`
     border-radius: 16px;
     overflow: hidden;
     background: var(--bg-secondary);
-    margin: 0 14px;
 `;
 export const CardRow = styled.div`
   display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; margin: 6px 0;
@@ -45,7 +44,7 @@ export const Screen = styled.div`
     gap: 16px;
     max-width: 900px;
     margin: 0 auto;
-    padding-bottom: 120px; /* leave space for bottom bar */
+    padding: 0 16px 100px; /* leave space for bottom bar */
 `;
 
 export const SummaryCard = styled.div`
@@ -75,6 +74,21 @@ export const PrimaryAction = styled(Button)`
     font-weight: 600 !important;
 `;
 
+export const PrimaryActionLink = styled.a`
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 16px;
+    flex-grow: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background-color: #2990ff !important;
+    color: #ffffff !important;
+    font-family: var(--fontSF), serif !important;
+    font-weight: 600 !important;
+`;
+
 export const IconBtn = styled.button<{ disabled?: boolean }>`
     width: 50px;
     height: 50px;
@@ -87,3 +101,37 @@ export const IconBtn = styled.button<{ disabled?: boolean }>`
     background: #2990ff;
     pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
 `;
+
+export const HistoryHeader = styled.button<{ open?: boolean }>`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+
+    & > span {
+        font-weight: 400;
+        font-size: 18px;
+    }
+
+    & svg {
+        transition: transform 250ms ease;
+        transform: rotate(${({open}) => (open ? 180 : 0)}deg);
+    }
+`;
+
+export const HistoryBodyOuter = styled.div`
+    overflow: hidden;
+`;
+
+export const HistoryBodyInner = styled.div`
+`;
+
+export const HistoryItemInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+`

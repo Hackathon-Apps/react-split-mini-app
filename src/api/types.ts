@@ -30,10 +30,11 @@ export interface TxPayload {
 }
 
 export interface HistoryItem {
-    bill_id: string;
+    id: string;
     destination_address: string;
-    total_amount: string;  // nanoton
-    created_at?: string;
+    goal: string;
+    status: BillStatus;
+    created_at: string;
 }
 
 // Удобные ключи для RQ

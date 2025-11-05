@@ -15,6 +15,7 @@ import {useContribute} from "../hooks/useContribute";
 import BillStats from "./ui/BillStats";
 import BillHero from "./ui/BillHero";
 import {useEnsureTelegramWallet} from "../hooks/useEnsureTelegramWallet";
+import LoadingOverlay from "./ui/Loading";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -77,7 +78,7 @@ export default function ProcessBill() {
         }
     };
 
-    if (isLoading || !bill) return <div>Loading…</div>;
+    if (isLoading || !bill) return <LoadingOverlay/>;
 
     return (
         <Screen>

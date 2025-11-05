@@ -1,42 +1,16 @@
 import React, {useEffect, useRef, useState} from "react";
-import styled from "styled-components";
 import type {Transaction} from "../../api/types";
 import {formatAddress, formatTon} from "../../utils/ton";
-import {Card, CardEmpty, CardRow, CardRowDivider, CardRowName, CardRowValue} from "../styled/styled";
-
-const HistoryHeader = styled.button<{ open?: boolean }>`
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    color: var(--text-secondary);
-
-    & > span {
-        font-weight: 400;
-        font-size: 18px;
-    }
-
-    & svg {
-        transition: transform 250ms ease;
-        transform: rotate(${({open}) => (open ? 180 : 0)}deg);
-    }
-`;
-
-const HistoryBodyOuter = styled.div`
-    overflow: hidden;
-`;
-
-const HistoryBodyInner = styled.div`
-`;
-
-const HistoryItemInfo = styled.div`
-    display: flex;
-    flex-direction: column;
-`
+import {
+    Card,
+    CardEmpty,
+    CardRow,
+    CardRowDivider,
+    CardRowName,
+    CardRowValue, HistoryBodyInner,
+    HistoryBodyOuter,
+    HistoryHeader, HistoryItemInfo
+} from "../styled/styled";
 
 type Props = {
     transactions?: Transaction[];
@@ -87,7 +61,8 @@ export default function BillTransactions({transactions, defaultOpen = false}: Pr
                                         }}>{formatAddress(t.sender_address)}</CardRowValue>
                                     </HistoryItemInfo>
                                     <CardRowValue
-                                        style={{color: "var(--success-color)", fontSize: 18}}>+{formatTon(t.amount)} TON</CardRowValue>
+                                        style={{color: "var(--success-color)", fontSize: 18}}>+{formatTon(t.amount)} TON
+                                    </CardRowValue>
                                 </CardRow>
                                 {t.id != transactions[transactions.length - 1].id && (<CardRowDivider/>)}
                             </>
