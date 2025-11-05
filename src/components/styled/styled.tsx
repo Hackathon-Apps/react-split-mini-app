@@ -38,3 +38,52 @@ export const CardRowValue = styled.span<{accent?: boolean}>`
 export const CardEmpty = styled.div`
   opacity: 0.6; text-align: center; padding: 12px 0;
 `;
+
+export const Screen = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 120px; /* leave space for bottom bar */
+`;
+
+export const SummaryCard = styled.div`
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+`;
+
+export const Actions = styled.div<{ disabled?: boolean }>`
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
+    pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
+`;
+
+export const PrimaryAction = styled(Button)`
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 16px;
+    flex-grow: 2;
+    background-color: #2990ff !important;
+    color: #ffffff !important;
+    font-family: var(--fontSF), serif !important;
+    font-weight: 600 !important;
+`;
+
+export const IconBtn = styled.button<{ disabled?: boolean }>`
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #2990ff;
+    color: #2990ff;
+    background: #2990ff;
+    pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
+`;

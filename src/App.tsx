@@ -13,6 +13,7 @@ import JoinScreen from "./components/JoinScreen";
 import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
+import BillDetailsScreen from "./components/BillDetailsScreen";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -53,10 +54,10 @@ function RootLayout() {
         WebApp.ready();
 
         // читаем диплинк-пейлоад при старте
-        const payload = readStartPayload<{ id: string; created_at: number }>();
+        const payload = readStartPayload<{ id: string; created_at?: number; tab: string}>();
         if (payload) {
             const q = payload.created_at ? `?created_at=${payload.created_at}` : "";
-            navigate(`/bills/${payload.id}${q}`, { replace: true });
+            navigate(`/${payload.tab}/${payload.id}${q}`, { replace: true });
         }
 
         // чистим ?tgWebAppStartParam, чтобы при F5 не повторялся старт
@@ -101,6 +102,7 @@ export default function App() {
                 <Route path="/join" element={<JoinScreen />} />
                 <Route path="/join/timeout" element={<JoinTimeOutScreen />} />
                 <Route path="/history" element={<HistoryScreen />} />
+                <Route path="/history/:id" element={<BillDetailsScreen />} />
                 <Route path="*" element={<Navigate to="/bills" replace />} />
             </Route>
         </Routes>
