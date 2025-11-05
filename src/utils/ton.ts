@@ -5,12 +5,16 @@ export function formatTon(n: number | string, fd: number = 3) {
     return Number(fromNano(n)).toLocaleString(undefined, { minimumFractionDigits: fd, maximumFractionDigits: fd });
 }
 
+export function formatAddress(address: string) {
+    return address.substring(0, 6) + "..." + address.substring(address.length - 4, address.length);
+}
+
 export function toncenterBase(chain?: CHAIN) {
     // можно прокинуть через .env, если нужно
     return chain === CHAIN.TESTNET ? "https://testnet.toncenter.com" : "https://toncenter.com";
 }
 
-export function buildContributePayload(extra?: (cell: import("@ton/core").Builder) => void): Cell {
+export function buildContributePayload(): Cell {
     const b = beginCell();
     return b.endCell();
 }

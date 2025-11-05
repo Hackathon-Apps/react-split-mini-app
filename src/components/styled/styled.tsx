@@ -1,28 +1,5 @@
 import styled from "styled-components";
 
-export const Card = styled.div`
-  padding: 18px 20px;
-  border-radius: 8px;
-  background-color: white;
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #111;
-  }
-`;
-
-export const FlexBoxRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-`;
-
-export const FlexBoxCol = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
 export const Button = styled.button`
   background-color: ${(props) =>
     props.disabled ? "#6e6e6e" : "var(--tg-theme-button-color)"};
@@ -35,19 +12,29 @@ export const Button = styled.button`
   pointer-events: ${(props) => (props.disabled ? "none" : "inherit")};
 `;
 
-export const Ellipsis = styled.div`
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+export const Card = styled.div`
+    border: 1px solid #3a3a3a;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    margin: 0 14px;
 `;
-
-export const Input = styled("input")`
-  padding: 10px 20px;
-  border-radius: 10px;
-  width: 100%;
-  border: 1px solid #c2c2c2;
-
-  @media (prefers-color-scheme: dark) {
-    border: 1px solid #fefefe;
-  }
+export const CardRow = styled.div`
+  display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; margin: 6px 0;
+`;
+export const CardRowDivider = styled.div`
+    border-bottom: 1px solid var(--separator);
+    margin: 12px 14px;
+`
+export const CardRowName = styled.span`
+    color: var(--text-secondary);
+    font-size: 18px;
+`;
+export const CardRowValue = styled.span<{accent?: boolean}>`
+    font-weight: 700;
+    max-width: 200px;
+    color: ${({accent}) => (accent ? "var(--accent)" : "var(--text)")};
+`;
+export const CardEmpty = styled.div`
+  opacity: 0.6; text-align: center; padding: 12px 0;
 `;

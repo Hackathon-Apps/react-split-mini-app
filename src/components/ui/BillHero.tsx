@@ -24,17 +24,18 @@ const RingBox = styled.div<{ pop?: boolean }>`
   transform: ${({pop}) => (pop ? "translate(-50%, -50%) scale(1.04)" : "translate(-50%, -50%)")};
 `;
 
-function ProgressRing({value, color = "#2990ff"}: { value: number; color?: string }) {
-    const radius = 44, stroke = 6, C = 2 * Math.PI * radius;
+function ProgressRing({value}: { value: number }) {
     const v = Math.max(0, Math.min(100, value));
+    const color = v == 100? "var(--success-color)" : "var(--accent)";
+    const radius = 44, stroke = 6, C = 2 * Math.PI * radius;
     const offset = C - (v / 100) * C;
     return (
         <svg width={200} height={200} viewBox="0 0 110 110">
-            <circle cx="55" cy="55" r={radius} stroke="#4c4c4c" strokeWidth={stroke} fill="none"/>
+            <circle cx="55" cy="55" r={radius} stroke="var(--bg-secondary)" strokeWidth={stroke} fill="none"/>
             <circle cx="55" cy="55" r={radius} stroke={color} strokeWidth={stroke} strokeLinecap="round"
                     fill="none" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 55 55)" />
             <text x="55" y="55" textAnchor="middle" fontWeight={400} fontSize="20" fill="currentColor">{Math.round(v)}%</text>
-            <text x="55" y="70" textAnchor="middle" fontWeight={400} fontSize="10" fill="#4c4c4c">collected</text>
+            <text x="55" y="70" textAnchor="middle" fontWeight={400} fontSize="10" fill="var(--text-secondary)">collected</text>
         </svg>
     );
 }
@@ -48,30 +49,27 @@ const formatMMSS = (sec: number) => {
 type Props = {
     percent: number;
     leftSec: number;
-    engaged: boolean; // собрали цель или таймер истёк
+    closed: boolean;
 };
 
-export default function BillHero({ percent, leftSec, engaged }: Props) {
+export default function BillHero({ percent, leftSec, closed }: Props) {
     return (
         <Stage>
-            <RingBox pop={engaged} style={{
-                transform: engaged
+            <RingBox pop={closed} style={{
+                transform: closed
                     ? "translate(-50%, -50%) scale(1.04)"
                     : "translate(calc(-50% - 75px), -50%) scale(1.0)",
                 transition: "transform 420ms ease"
             }}>
                 <div style={{position: "relative", width: 200, height: 200}}>
-                    <div style={{ position: "absolute", inset: 0, opacity: engaged ? 0 : 1, transition: "opacity 300ms ease" }}>
-                        <ProgressRing value={percent} color="#2990ff"/>
-                    </div>
-                    <div style={{ position: "absolute", inset: 0, opacity: engaged ? 1 : 0, transition: "opacity 300ms ease" }}>
-                        <ProgressRing value={percent} color="#27ae60"/>
+                    <div style={{ position: "absolute", inset: 0, transition: "color 300ms ease" }}>
+                        <ProgressRing value={percent}/>
                     </div>
                 </div>
             </RingBox>
 
-            <TimerBox hidden={engaged} aria-live="polite" style={{
-                transform: engaged
+            <TimerBox hidden={closed} aria-live="polite" style={{
+                transform: closed
                     ? "translate(-50%, -50%) scale(0.98)"
                     : "translate(calc(-50% + 75px), -50%)",
                 transition: "opacity 320ms ease, transform 420ms ease"

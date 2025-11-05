@@ -1,48 +1,49 @@
 import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
-import type { Transaction } from "../../api/types";
-import { formatTon } from "../../utils/ton";
-
-const HistoryCard = styled.div`
-  border: 1px solid #2c2c2c;
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
-`;
+import type {Transaction} from "../../api/types";
+import {formatAddress, formatTon} from "../../utils/ton";
+import {Card, CardEmpty, CardRow, CardRowDivider, CardRowName, CardRowValue} from "../styled/styled";
 
 const HistoryHeader = styled.button<{ open?: boolean }>`
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; background: transparent; border: 0; cursor: pointer; color: inherit;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
 
-  & > span { font-weight: 700; font-size: 16px; }
-  & svg { transition: transform 250ms ease; transform: rotate(${({open}) => (open ? 180 : 0)}deg); }
+    & > span {
+        font-weight: 400;
+        font-size: 18px;
+    }
+
+    & svg {
+        transition: transform 250ms ease;
+        transform: rotate(${({open}) => (open ? 180 : 0)}deg);
+    }
 `;
 
 const HistoryBodyOuter = styled.div`
-  overflow: hidden;
+    overflow: hidden;
 `;
 
 const HistoryBodyInner = styled.div`
-  padding: 12px 14px;
 `;
 
-const HistoryEmpty = styled.div`
-  opacity: 0.6; text-align: center; padding: 12px 0;
-`;
-
-const HistoryItem = styled.div`
-  display: flex; align-items: center; justify-content: space-between; padding: 8px 0;
-  &:not(:last-child) { border-bottom: 1px dashed #2c2c2c; }
-`;
+const HistoryItemInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+`
 
 type Props = {
     transactions?: Transaction[];
     defaultOpen?: boolean;
-    className?: string;
 };
 
-export default function BillTransactions({ transactions, defaultOpen = false, className }: Props) {
+export default function BillTransactions({transactions, defaultOpen = false}: Props) {
     const [open, setOpen] = useState(defaultOpen);
     const bodyOuterRef = useRef<HTMLDivElement | null>(null);
     const bodyInnerRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +52,7 @@ export default function BillTransactions({ transactions, defaultOpen = false, cl
     useEffect(() => {
         const measure = () => {
             const h = bodyInnerRef.current?.scrollHeight ?? 0;
-            setBodyHeight(open ? h : 0);
+            setBodyHeight(open ? h + 12 : 0);
         };
         measure();
         window.addEventListener("resize", measure);
@@ -59,30 +60,40 @@ export default function BillTransactions({ transactions, defaultOpen = false, cl
     }, [open, transactions?.length]);
 
     return (
-        <HistoryCard className={className}>
+        <Card>
             <HistoryHeader open={open} onClick={() => setOpen(o => !o)} aria-expanded={open}>
                 <span>History</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                          strokeLinejoin="round"/>
                 </svg>
             </HistoryHeader>
 
-            <HistoryBodyOuter ref={bodyOuterRef} style={{ height: bodyHeight, transition: "height 260ms ease" }}>
+            <HistoryBodyOuter ref={bodyOuterRef} style={{height: bodyHeight, transition: "height 260ms ease"}}>
                 <HistoryBodyInner ref={bodyInnerRef}>
                     {!transactions || transactions.length === 0 ? (
-                        <HistoryEmpty>No transactions</HistoryEmpty>
+                        <CardEmpty>No transactions</CardEmpty>
                     ) : (
-                        transactions.map((h) => (
-                            <HistoryItem key={h.id}>
-                                <span><strong>{formatTon(h.amount)} TON</strong> from {h.sender_address}</span>
-                                <span style={{ opacity: 0.7 }}>
-                  {new Date(h.created_at).toLocaleTimeString()}
-                </span>
-                            </HistoryItem>
-                        ))
-                    )}
+                        transactions.map((t) => (
+                            <>
+                                <CardRow key={t.id}>
+                                    <HistoryItemInfo>
+                                        <CardRowName>
+                                            {new Date(t.created_at).toLocaleString()}
+                                        </CardRowName>
+                                        <CardRowValue style={{
+                                            fontWeight: 400,
+                                            fontSize: 18
+                                        }}>{formatAddress(t.sender_address)}</CardRowValue>
+                                    </HistoryItemInfo>
+                                    <CardRowValue
+                                        style={{color: "var(--success-color)", fontSize: 18}}>+{formatTon(t.amount)} TON</CardRowValue>
+                                </CardRow>
+                                {t.id != transactions[transactions.length - 1].id && (<CardRowDivider/>)}
+                            </>
+                        )))}
                 </HistoryBodyInner>
             </HistoryBodyOuter>
-        </HistoryCard>
+        </Card>
     );
 }
