@@ -32,7 +32,7 @@ export interface TxPayload {
 export interface HistoryItem {
     id: string;
     destination_address: string;
-    goal: string;
+    amount: number;
     status: BillStatus;
     created_at: string;
 }

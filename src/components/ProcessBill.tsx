@@ -16,6 +16,7 @@ import BillStats from "./ui/BillStats";
 import BillHero from "./ui/BillHero";
 import {useEnsureTelegramWallet} from "../hooks/useEnsureTelegramWallet";
 import LoadingOverlay from "./ui/Loading";
+import {useBillSubscription} from "../hooks/useBillSubscription";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -32,6 +33,7 @@ export default function ProcessBill() {
     const sender = useTonAddress();
 
     const {data: bill, isLoading} = useBillQuery(id as string);
+    useBillSubscription(id);
     const leftSec = useBillCountdown(bill?.created_at);
 
     const percent = useMemo(
