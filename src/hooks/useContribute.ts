@@ -15,16 +15,16 @@ export function useContribute(
         if (!billId || !proxyWallet) throw new Error("Bill not ready");
         const payload = buildContributePayload();
 
+        await createTx.mutateAsync({
+            amount: amountTons,
+            op_type: "CONTRIBUTE",
+        });
+
         await transfer.mutateAsync({
             to: proxyWallet,
             amountTons,
             payload,
             stateInitBase64: stateInitHash,
-        });
-
-        await createTx.mutateAsync({
-            amount: amountTons,
-            op_type: "CONTRIBUTE",
         });
     }, [billId, proxyWallet, transfer, createTx]);
 

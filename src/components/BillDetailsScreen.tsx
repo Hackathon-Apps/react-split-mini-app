@@ -9,11 +9,13 @@ import BillHero from "./ui/BillHero";
 import BillStatsClosed from "./ui/BillStatsClosed";
 import {Screen, Actions, IconBtn, SummaryCard, PrimaryActionLink} from "./styled/styled";
 import LoadingOverlay from "./ui/Loading";
+import {useBillSubscription} from "../hooks/useBillSubscription";
 
 export default function BillDetailsScreen() {
     const {id} = useParams<{ id?: string, created_at: string }>();
 
     const {data: bill, isLoading} = useBillQuery(id as string);
+    useBillSubscription(id);
 
     const percent = useMemo(
         () => (bill?.goal ? (bill.goal <= 0 ? 0 : (bill.collected / bill.goal) * 100) : 0),
@@ -25,6 +27,7 @@ export default function BillDetailsScreen() {
     );
 
     const [shareOpen, setShareOpen] = useState(false);
+    const closed = bill?.status !== "ACTIVE";
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 

@@ -27,7 +27,7 @@ export default function HistoryScreen() {
                                     fontSize: 18
                                 }}>{formatAddress(item.destination_address)}</CardRowValue>
                             </HistoryItemInfo>
-                            <CardRowValue style={{fontWeight: 400, fontSize: 18}}>{formatTon(item.goal)} TON</CardRowValue>
+                            <CardRowValue style={{fontWeight: 400, fontSize: 18}}>{formatTon(item.amount)} TON</CardRowValue>
                         </CardRow>
                         {item.id != history[history.length - 1].id && (<CardRowDivider/>)}
                     </NavLink>

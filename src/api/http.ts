@@ -1,7 +1,12 @@
 const BASE_URL =
     import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "https://tagwaiter.ru/api";
+const WS_BASE_URL = BASE_URL.replace(/^http/, "ws");
 
 type RequestOpts = { sender?: string; signal?: AbortSignal };
+
+function joinUrl(base: string, path: string) {
+    return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 async function request<T>(
     method: "GET" | "POST",
@@ -12,7 +17,7 @@ async function request<T>(
     const headers: Record<string, string> = { };
     if (opts.sender) headers["Sender-Address"] = opts.sender;
 
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(joinUrl(BASE_URL, path), {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
@@ -33,5 +38,6 @@ export const http = {
     get: <T>(path: string, opts?: RequestOpts) => request<T>("GET", path, undefined, opts),
     post: <T>(path: string, body?: unknown, opts?: RequestOpts) =>
         request<T>("POST", path, body, opts),
+    wsUrl: (path: string) => joinUrl(WS_BASE_URL, path),
     BASE_URL,
 };
