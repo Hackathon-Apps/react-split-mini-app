@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import WebApp from "@twa-dev/sdk";
 import { scanQR } from "../utils/scanQR";
+import {InfoScreen} from "./styled/styled";
 
 export default function JoinScreen() {
     useEffect(() => {
@@ -8,5 +9,5 @@ export default function JoinScreen() {
             WebApp.openTelegramLink(link);
         }, "Scan QR to join");
     }, []);
-    return <div>Scan a QR to join a bill…</div>;
+    return <InfoScreen>Scan a QR to join a bill…</InfoScreen>;
 }

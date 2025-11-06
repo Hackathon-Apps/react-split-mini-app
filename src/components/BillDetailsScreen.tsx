@@ -7,9 +7,10 @@ import {useParams} from "react-router-dom";
 import BillTransactions from "./ui/BillTransactions";
 import BillHero from "./ui/BillHero";
 import BillStatsClosed from "./ui/BillStatsClosed";
-import {Screen, Actions, IconBtn, SummaryCard, PrimaryActionLink} from "./styled/styled";
+import {Screen, Actions, IconBtn, SummaryCard, PrimaryAction} from "./styled/styled";
 import LoadingOverlay from "./ui/Loading";
 import {useBillSubscription} from "../hooks/useBillSubscription";
+import WebApp from "@twa-dev/sdk";
 
 export default function BillDetailsScreen() {
     const {id} = useParams<{ id?: string, created_at: string }>();
@@ -39,10 +40,13 @@ export default function BillDetailsScreen() {
 
             <BillStatsClosed collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} created_at={bill.created_at}/>
             <Actions>
-                <PrimaryActionLink href={`https://tonviewer.com/${bill.proxy_wallet}`}>
+                <PrimaryAction onClick={() =>
+                    WebApp.showConfirm(`Open ${url}?`, (confirmed) => {
+                        if (confirmed) WebApp.openTelegramLink(url);
+                })}>
                     <img src="/global.svg" width="20" height="20" alt="Global"/>
                     <span style={{verticalAlign: "top", marginLeft: 5}}>Blockchain Explorer</span>
-                </PrimaryActionLink>
+                </PrimaryAction>
                 <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
                     <img src="/share.svg" width="20" height="20" alt="Share"/>
                 </IconBtn>

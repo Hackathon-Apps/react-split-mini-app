@@ -13,7 +13,6 @@ export const Button = styled.button`
 `;
 
 export const Card = styled.div`
-    border: 1px solid #3a3a3a;
     border-radius: 16px;
     overflow: hidden;
     background: var(--bg-secondary);
@@ -134,4 +133,12 @@ export const HistoryBodyInner = styled.div`
 export const HistoryItemInfo = styled.div`
     display: flex;
     flex-direction: column;
+`
+
+export const InfoScreen = styled.div`
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    min-height: 60vh;
+    text-align: center;
 `

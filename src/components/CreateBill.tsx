@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import {Address} from "@ton/ton";
-import {Button} from "./styled/styled";
+import {Button, InfoScreen} from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import {useUIState} from "../state/uiState";
 import {useTonAddress} from "@tonconnect/ui-react";
@@ -23,12 +23,13 @@ const Field = styled.fieldset<{ invalid?: boolean }>`
     margin: 5px 20px;
     padding: 6px 12px 10px;
     border-radius: 20px;
-    border: 1px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--stroke)")};
+    border: 3px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
     background: transparent;
 
 `;
 
 const Legend = styled.legend`
+    color: var(--input);
     padding: 0 6px;
     opacity: 0.9;
     font-weight: 600;
@@ -87,10 +88,6 @@ const TrailingIconButton = styled.button`
     background: transparent;
     color: inherit;
     cursor: pointer;
-
-    @media (prefers-color-scheme: dark) {
-        border-color: #3a3a3a;
-    }
 `;
 
 const TonBadge = styled.div`
@@ -289,7 +286,9 @@ export function CreateBill() {
                 </Row>
                 {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
             </Field>
-
+            <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
+                If the goal is not achieved within 10 minutes, the funds will be returned back.
+            </InfoScreen>
             <Footer/>
 
             <FixedCtaWrap hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>

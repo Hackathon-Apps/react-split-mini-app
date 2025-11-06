@@ -30,8 +30,8 @@ function ProgressRing({value}: { value: number }) {
     const radius = 44, stroke = 6, C = 2 * Math.PI * radius;
     const offset = C - (v / 100) * C;
     return (
-        <svg width={200} height={200} viewBox="0 0 110 110">
-            <circle cx="55" cy="55" r={radius} stroke="var(--bg-secondary)" strokeWidth={stroke} fill="none"/>
+        <svg width={200} height={200} viewBox="0 0 120 120">
+            <circle cx="55" cy="55" r={radius} stroke="var(--ring-color)" strokeWidth={stroke} fill="none"/>
             <circle cx="55" cy="55" r={radius} stroke={color} strokeWidth={stroke} strokeLinecap="round"
                     fill="none" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 55 55)" />
             <text x="55" y="55" textAnchor="middle" fontWeight={400} fontSize="20" fill="currentColor">{Math.round(v)}%</text>

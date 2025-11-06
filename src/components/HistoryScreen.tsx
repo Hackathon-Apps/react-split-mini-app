@@ -1,4 +1,4 @@
-import {Card, CardRow, CardRowDivider, CardRowName, CardRowValue, HistoryItemInfo} from "./styled/styled";
+import {Card, CardRow, CardRowDivider, CardRowName, CardRowValue, HistoryItemInfo, InfoScreen} from "./styled/styled";
 import {useHistoryQuery} from "../api/queries";
 import {useTonAddress} from "@tonconnect/ui-react";
 import React from "react";
@@ -11,7 +11,8 @@ export default function HistoryScreen() {
     const {data: history, isLoading, isError} = useHistoryQuery(sender)
 
     if (isLoading) return <LoadingOverlay/>
-    if (isError) return <div>No transactions</div>
+    if (!sender) return <InfoScreen>Connect wallet to get bills history</InfoScreen>
+    if (isError) return <InfoScreen>No transactions</InfoScreen>
     return (
         <>
             <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>History</div>

@@ -6,15 +6,17 @@
 }
 
 :root {
-    --bg: #ffffff;
-    --bg-secondary: #404040;
-    --text: #0f0f0f;
+    --bg: #e1e1e1;
+    --bg-secondary: #ffffff;
+    --text: #4e4e4e;
     --text-secondary: #8e8e93;
     --muted: #6b6b6b;
+    --ring-color: #bfbfbf;
 
     --surface-1: #f5f5f7;
     --surface-2: #ffffff;
     --stroke: #3a3a3a;
+    --input: #a1a1a1;
     --separator: #dcdcdc;
 
     --accent: #2676ff;
@@ -24,38 +26,25 @@
     --backdrop: rgba(0, 0, 0, .5);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #2f2f30;
-        --bg-secondary: #404040;
-        --text: #f2f2f2;
-        --text-secondary: #8e8e93;
-        --muted: #a7a7a7;
+/*@media (prefers-color-scheme: dark) {*/
+/*    :root {*/
+/*        --bg: #2f2f30;*/
+/*        --bg-secondary: #404040;*/
+/*        --text: #f2f2f2;*/
+/*        --text-secondary: #8e8e93;*/
+/*        --muted: #a7a7a7;*/
 
-        --surface-1: #151517;
-        --surface-2: #111113;
-        --stroke: #727272;
-        --separator: #c8c7cb;
+/*        --surface-1: #151517;*/
+/*        --surface-2: #111113;*/
+/*        --stroke: #727272;*/
+/*        --separator: #c8c7cb;*/
 
-        --accent: #2990ff;
-        --accent-contrast: #ffffff;
-        --success-color: #34c759;
+/*        --accent: #2990ff;*/
+/*        --accent-contrast: #ffffff;*/
+/*        --success-color: #34c759;*/
 
-        --backdrop: rgba(0, 0, 0, .55);
-    }
-}
-
-/*!* Телеграм подсовывает свои CSS vars — пусть они побеждают, если есть *!*/
-/*:root {*/
-/*  !* если присутствуют --tg-theme-* — маппим их на наши *!*/
-/*  --bg: var(--tg-theme-bg-color, var(--bg));*/
-/*  --text: var(--tg-theme-text-color, var(--text));*/
-/*  --muted: var(--tg-theme-hint-color, var(--muted));*/
-/*  --surface-1: var(--tg-theme-secondary-bg-color, var(--surface-1));*/
-/*  --surface-2: var(--tg-theme-bg-color, var(--surface-2));*/
-/*  --accent: var(--tg-theme-button-color, var(--accent));*/
-/*  --accent-contrast: var(--tg-theme-button-text-color, var(--accent-contrast));*/
-/*  !* разделители у Telegram отдельные не всегда есть — оставим дефолты *!*/
+/*        --backdrop: rgba(0, 0, 0, .55);*/
+/*    }*/
 /*}*/
 
 html, body, #root {

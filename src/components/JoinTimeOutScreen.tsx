@@ -1,3 +1,5 @@
+import {InfoScreen} from "./styled/styled";
+
 export default function JoinTimeOutScreen() {
-    return <div>Bill is timed out…</div>;
+    return <InfoScreen>Bill is timed out…</InfoScreen>;
 }

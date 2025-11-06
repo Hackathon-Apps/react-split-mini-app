@@ -36,8 +36,8 @@ const QuickRow = styled.div`
   margin-bottom: 12px;
 `;
 const Chip = styled.button`
-  min-width: 64px; height: 36px; padding: 0 10px;
-  border-radius: 10px; border: 1px solid var(--stroke); background: var(--surface-1); color: var(--text);
+  min-width: 51px; height: 29px; padding: 0 10px;
+  border-radius: 13px; border: 1px solid var(--stroke); background: var(--bg-secondary); color: var(--text);
   font-weight: 600;
 `;
 

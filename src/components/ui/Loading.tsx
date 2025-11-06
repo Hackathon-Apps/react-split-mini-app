@@ -107,14 +107,9 @@ const Card = styled.div`
   gap: 12px;
   align-items: center;
   justify-content: center;
-  background: var(--tg-theme-bg-color, #ffffff);
-  color: var(--tg-theme-text-color, #111);
+  background: var(--bg);
+  color: var(--text);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-
-  @media (prefers-color-scheme: dark) {
-    background: var(--tg-theme-bg-color, #2a2a2a);
-    color: var(--tg-theme-text-color, #f1f1f1);
-  }
 `;
 
 const Text = styled.div`
