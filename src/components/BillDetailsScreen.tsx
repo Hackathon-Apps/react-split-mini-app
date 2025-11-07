@@ -28,7 +28,6 @@ export default function BillDetailsScreen() {
     );
 
     const [shareOpen, setShareOpen] = useState(false);
-    const closed = bill?.status !== "ACTIVE";
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 
@@ -47,7 +46,7 @@ export default function BillDetailsScreen() {
                     <img src="/global.svg" width="20" height="20" alt="Global"/>
                     <span style={{verticalAlign: "top", marginLeft: 5}}>Blockchain Explorer</span>
                 </PrimaryAction>
-                <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
+                <IconBtn aria-label="Share" onClick={() => setShareOpen(true)}>
                     <img src="/share.svg" width="20" height="20" alt="Share"/>
                 </IconBtn>
             </Actions>

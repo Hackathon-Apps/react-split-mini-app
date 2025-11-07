@@ -40,7 +40,8 @@ export default function ProcessBill() {
         () => (bill?.goal ? (bill.goal <= 0 ? 0 : (bill.collected / bill.goal) * 100) : 0),
         [bill?.goal, bill?.collected]
     );
-    const leftTon = bill ? Math.max(0, bill.goal - bill.collected) : 0;
+    const leftNano = bill ? Math.max(0, bill.goal - bill.collected) : 0;
+    const leftTon = Number(fromNano(leftNano));
     const url = useMemo(
         () => buildMiniAppLink("CryptoSplitBot", {id: bill?.id, created_at: bill?.created_at, tab: "bills"}),
         [bill?.id, bill?.created_at]
@@ -56,7 +57,7 @@ export default function ProcessBill() {
 
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender)
 
-    const closed = bill ? leftTon === 0 || leftSec == 0 : false;
+    const closed = bill ? leftNano === 0 || leftSec == 0 : false;
 
     useEffect(() => {
         if (!bill) return;
@@ -100,7 +101,12 @@ export default function ProcessBill() {
                 </Actions>
             </SummaryCard>
 
-            <BillStats collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} left={leftTon}/>
+            <BillStats
+                collected={bill.collected}
+                goal={bill.goal}
+                receiver={formatAddress(bill.destination_address)}
+                left={leftNano}
+            />
 
             <BillTransactions transactions={bill.transactions} />
 
@@ -109,7 +115,7 @@ export default function ProcessBill() {
             <PaySheet
                 open={payOpen}
                 onClose={() => setPayOpen(false)}
-                totalTon={Number(fromNano(bill.goal))}
+                totalTon={leftTon}
                 amountTon={amount}
                 onChange={setAmount}
                 onPay={handlePay}
