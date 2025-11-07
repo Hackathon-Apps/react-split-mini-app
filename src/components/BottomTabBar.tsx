@@ -74,7 +74,7 @@ export default function BottomTabBar({
       <Dock>
         <Item active={active === "bills"} onClick={() => onChange("bills")}>
           <IconImg src={active === "bills" ? "/bill-active.svg" : "/bill.svg"} alt="Bills" />
-          <Label>New</Label>
+          <Label>Bills</Label>
         </Item>
         <Item active={active === "join"} onClick={() => onChange("join")}>
           <IconImg src={active === "join" ? "/qr-active.svg" : "/qr.svg"} alt="Join" />
