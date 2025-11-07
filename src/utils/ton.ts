@@ -15,6 +15,7 @@ export function toncenterBase(chain?: CHAIN) {
 }
 
 export function buildContributePayload(): Cell {
-    const b = beginCell();
-    return b.endCell();
+    return beginCell()
+        .storeUint(0xCF4D2AC0, 32)
+        .endCell();
 }

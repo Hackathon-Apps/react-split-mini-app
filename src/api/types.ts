@@ -7,6 +7,7 @@ export interface Bill {
     creator_address: string;
     destination_address: string;
     created_at: string;
+    ended_at: string;
     status: BillStatus;
     proxy_wallet: string;
     state_init_hash: string;

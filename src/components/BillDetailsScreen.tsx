@@ -38,7 +38,7 @@ export default function BillDetailsScreen() {
                 <BillHero percent={percent} leftSec={0} closed={true} />
             </SummaryCard>
 
-            <BillStatsClosed collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} created_at={bill.created_at}/>
+            <BillStatsClosed collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} created_at={bill.created_at} closed_at={bill.ended_at}/>
             <Actions>
                 <PrimaryAction onClick={() =>
                     WebApp.showConfirm(`Open ${url}?`, (confirmed) => {

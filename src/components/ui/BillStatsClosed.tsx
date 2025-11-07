@@ -18,7 +18,7 @@ export default function BillStatsClosed({collected, goal, receiver, created_at, 
             </Card>
             <Card>
                 <CardRow><CardRowName>Started</CardRowName><CardRowValue>{new Date(created_at).toLocaleString()}</CardRowValue></CardRow>
-                <CardRow><CardRowName>Started</CardRowName><CardRowValue>{new Date(closed_at ?? (Date.parse(created_at) + 600000)).toLocaleString()}</CardRowValue></CardRow>
+                <CardRow><CardRowName>Ended</CardRowName><CardRowValue>{new Date(closed_at ?? (Date.parse(created_at) + 600000)).toLocaleString()}</CardRowValue></CardRow>
             </Card>
             <Card>
                 <CardRow><CardRowName>Receiver</CardRowName><CardRowValue>{receiver}</CardRowValue></CardRow>

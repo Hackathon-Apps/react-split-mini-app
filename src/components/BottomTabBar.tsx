@@ -73,7 +73,7 @@ export default function BottomTabBar({
     <Bar hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>
       <Dock>
         <Item active={active === "bills"} onClick={() => onChange("bills")}>
-          <IconImg src={active === "bills" ? "/bill-active.svg" : "/bill.svg"} alt="New" />
+          <IconImg src={active === "bills" ? "/bill-active.svg" : "/bill.svg"} alt="Bills" />
           <Label>New</Label>
         </Item>
         <Item active={active === "join"} onClick={() => onChange("join")}>
