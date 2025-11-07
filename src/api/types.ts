@@ -1,4 +1,4 @@
-export type BillStatus = "ACTIVE" | "COMPLETED" | "REFUNDED" | "CANCELLED";
+export type BillStatus = "ACTIVE" | "DONE" | "TIMEOUT";
 
 export interface Bill {
     id: string;

@@ -60,8 +60,14 @@ export default function ProcessBill() {
 
     useEffect(() => {
         if (!bill) return;
+
+        if (bill.status === "DONE" || bill.status === "TIMEOUT") {
+            localStorage.removeItem(LAST_BILL_KEY);
+            return;
+        }
+
         localStorage.setItem(LAST_BILL_KEY, bill.id);
-    }, [bill?.id]);
+    }, [bill?.id, bill?.status]);
 
     useEffect(() => {
         if (leftSec == 0) {
