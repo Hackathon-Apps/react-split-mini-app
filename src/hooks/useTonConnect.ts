@@ -18,16 +18,16 @@ export function useTonConnect(): {
           ? beginCell().store(storeStateInit(args.init)).endCell().toBoc().toString("base64")
           : undefined;
 
-        tonConnectUI.sendTransaction({
-          messages: [
-            {
-              address: args.to.toString(),
-              amount: args.value.toString(),
-              payload: args.body?.toBoc().toString("base64"),
-              stateInit: stateInitBoc,
-            },
-          ],
-          validUntil: Date.now() + 5 * 60 * 1000, // 5 minutes for user to approve
+        await tonConnectUI.sendTransaction({
+            messages: [
+                {
+                    address: args.to.toString(),
+                    amount: args.value.toString(),
+                    payload: args.body?.toBoc().toString("base64"),
+                    stateInit: stateInitBoc,
+                },
+            ],
+            validUntil: Date.now() + 5 * 60 * 1000, // 5 minutes for user to approve
         });
       },
     },

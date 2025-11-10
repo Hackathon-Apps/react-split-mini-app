@@ -43,7 +43,7 @@ export default function BillDetailsScreen() {
             <Actions>
                 <PrimaryAction onClick={() =>
                     WebApp.showConfirm(`Open https://tonviewer.com/${bill.proxy_wallet}?`, (confirmed) => {
-                        if (confirmed) WebApp.openTelegramLink(`https://tonviewer.com/${bill.proxy_wallet}`);
+                        if (confirmed) WebApp.openLink(`https://tonviewer.com/${bill.proxy_wallet}`);
                     })}>
                     <img src="/global.svg" width="20" height="20" alt="Global"/>
                     <span style={{verticalAlign: "top", marginLeft: 5}}>Blockchain Explorer</span>
