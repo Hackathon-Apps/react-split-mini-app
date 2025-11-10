@@ -31,6 +31,9 @@ export const CardRowName = styled.span`
 export const CardRowValue = styled.span<{accent?: boolean}>`
     font-weight: 700;
     max-width: 200px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     color: ${({accent}) => (accent ? "var(--accent)" : "var(--text)")};
 `;
 export const CardEmpty = styled.div`
@@ -142,3 +145,16 @@ export const InfoScreen = styled.div`
     min-height: 60vh;
     text-align: center;
 `
+
+export const TrailingIconButton = styled.button`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    border-radius: 8px;
+    border: 1px solid #c2c2c2;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+`;

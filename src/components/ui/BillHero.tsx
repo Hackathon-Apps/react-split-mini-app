@@ -3,13 +3,13 @@ import styled, { css } from "styled-components";
 
 const Stage = styled.div`
   position: relative; width: 100%; min-height: 220px;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 `;
 const stackCenter = css`
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
 `;
 const TimerBox = styled.div<{ hidden?: boolean }>`
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; flex-direction: column;
   padding: 6px 10px; border-radius: 12px; background: transparent;
   ${stackCenter};
   transition: opacity 400ms ease, transform 400ms ease;
@@ -17,7 +17,7 @@ const TimerBox = styled.div<{ hidden?: boolean }>`
   transform: ${({hidden}) => (hidden ? "translate(-50%, -50%) scale(0.98)" : "translate(-50%, -50%)")};
 `;
 const TimeLeft = styled.div`
-  font-family: var(--fontSF), serif; font-weight: 450; font-size: 45px; letter-spacing: 0.3px;
+  font-family: var(--fontSF), serif; font-weight: 450; font-size: 38px; letter-spacing: 0.3px;
 `;
 const RingBox = styled.div<{ pop?: boolean }>`
   ${stackCenter}; transition: transform 400ms ease;
@@ -75,6 +75,7 @@ export default function BillHero({ percent, leftSec, closed }: Props) {
                 transition: "opacity 320ms ease, transform 420ms ease"
             }}>
                 <TimeLeft>{formatMMSS(leftSec)}</TimeLeft>
+                <span style={{color: "var(--text-secondary)", paddingBottom: 20}}>time left</span>
             </TimerBox>
         </Stage>
     );

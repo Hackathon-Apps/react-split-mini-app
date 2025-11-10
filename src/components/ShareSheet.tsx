@@ -47,12 +47,7 @@ export default function ShareSheet({
     const [copied, setCopied] = useState(false);
 
     const copyLink = useCallback(async () => {
-        try { await navigator.clipboard.writeText(url); }
-        catch {
-            const ta = document.createElement("textarea");
-            ta.value = url; document.body.appendChild(ta);
-            ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-        }
+        await navigator.clipboard.writeText(url);
         WebApp.HapticFeedback?.notificationOccurred?.("success");
         setCopied(true); setTimeout(() => setCopied(false), 1200);
     }, [url]);

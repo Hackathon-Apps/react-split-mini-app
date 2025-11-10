@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import {Address} from "@ton/ton";
-import {Button, InfoScreen} from "./styled/styled";
+import {Button, InfoScreen, TrailingIconButton} from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import {useUIState} from "../state/uiState";
 import {useTonAddress} from "@tonconnect/ui-react";
@@ -75,19 +75,6 @@ const Input = styled.input`
         font-weight: 600;
         font-size: 16px;
     }
-`;
-
-const TrailingIconButton = styled.button`
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    border-radius: 8px;
-    border: 1px solid #c2c2c2;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
 `;
 
 const TonBadge = styled.div`
@@ -213,7 +200,7 @@ export function CreateBill() {
     const minPart = 0.1;
     const isValidAmount = (v: string) => {
         const n = Number(v);
-        return Number.isFinite(n) && n > minPart;
+        return Number.isFinite(n) && n >= minPart;
     };
     const totalInvalid = total !== "" && !isValidAmount(total);
     const receiverInvalid = receiver !== "" && (() => {

@@ -1,6 +1,7 @@
 import React from "react";
-import {formatTon} from "../../utils/ton";
-import {Card, CardRow, CardRowName, CardRowValue} from "../styled/styled";
+import {formatAddress, formatTon} from "../../utils/ton";
+import {Card, CardRow, CardRowName, CardRowValue, TrailingIconButton} from "../styled/styled";
+import WebApp from "@twa-dev/sdk";
 
 type Props = {
     collected: number;
@@ -21,7 +22,17 @@ export default function BillStatsClosed({collected, goal, receiver, created_at, 
                 <CardRow><CardRowName>Ended</CardRowName><CardRowValue>{new Date(closed_at ?? (Date.parse(created_at) + 600000)).toLocaleString()}</CardRowValue></CardRow>
             </Card>
             <Card>
-                <CardRow><CardRowName>Receiver</CardRowName><CardRowValue>{receiver}</CardRowValue></CardRow>
+                <CardRow>
+                    <CardRowName>Receiver</CardRowName>
+                    <CardRowValue>{formatAddress(receiver)}
+                        <TrailingIconButton onClick={async () => {
+                            await navigator.clipboard.writeText(receiver);
+                            WebApp.HapticFeedback?.notificationOccurred("success")
+                        }} style={{marginLeft: 10, border: "none"}}>
+                            <img src="/copy.svg" alt="Copy"/>
+                        </TrailingIconButton>
+                    </CardRowValue>
+                </CardRow>
             </Card>
         </>
     );

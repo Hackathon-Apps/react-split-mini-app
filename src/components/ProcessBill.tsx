@@ -5,7 +5,7 @@ import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
 import {useBillQuery, useTonBalance} from "../api/queries";
-import {formatAddress, formatTon} from "../utils/ton";
+import {formatTon} from "../utils/ton";
 import {useTonAddress} from "@tonconnect/ui-react";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {fromNano} from "@ton/core";
@@ -92,7 +92,7 @@ export default function ProcessBill() {
         <Screen>
             <SummaryCard>
                 <BillHero percent={percent} leftSec={leftSec} closed={closed} />
-                <Actions disabled={closed}>
+                <Actions disabled={closed || !sender}>
                     <PrimaryAction onClick={() => setPayOpen(true)} disabled={closed}>Contribute</PrimaryAction>
                     <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
                         <img src="/share.svg" width="20" height="20" alt="Share"/>
@@ -100,7 +100,7 @@ export default function ProcessBill() {
                 </Actions>
             </SummaryCard>
 
-            <BillStats collected={bill.collected} goal={bill.goal} receiver={formatAddress(bill.destination_address)} left={leftTon}/>
+            <BillStats collected={bill.collected} goal={bill.goal} receiver={bill.destination_address} left={leftTon}/>
 
             <BillTransactions transactions={bill.transactions} />
 

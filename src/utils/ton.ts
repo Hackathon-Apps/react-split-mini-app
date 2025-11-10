@@ -2,7 +2,7 @@ import {CHAIN} from "@tonconnect/protocol";
 import {beginCell, Cell, fromNano} from "@ton/core";
 
 export function formatTon(n: number | string, fd: number = 3) {
-    return Number(fromNano(n)).toLocaleString(undefined, { minimumFractionDigits: fd, maximumFractionDigits: fd });
+    return Number(fromNano(n)).toLocaleString(undefined, { maximumFractionDigits: fd });
 }
 
 export function formatAddress(address: string) {
