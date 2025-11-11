@@ -1,6 +1,14 @@
-import React from "react";
+import React, {useState} from "react";
 import {formatAddress, formatTon} from "../../utils/ton";
-import {Card, CardRow, CardRowDivider, CardRowName, CardRowValue, TrailingIconButton} from "../styled/styled";
+import {
+    Card,
+    CardRow,
+    CardRowDivider,
+    CardRowName,
+    CardRowValue,
+    CopiedBadge,
+    TrailingIconButton
+} from "../styled/styled";
 import WebApp from "@twa-dev/sdk";
 
 type Props = {
@@ -11,6 +19,7 @@ type Props = {
 };
 
 export default function BillStats({ collected, goal, receiver, left }: Props) {
+    const [copied, setCopied] = useState(false);
     return (<>
         <Card>
             <CardRow><CardRowName>Collected</CardRowName><CardRowValue>{formatTon(collected)} TON</CardRowValue></CardRow>
@@ -25,8 +34,10 @@ export default function BillStats({ collected, goal, receiver, left }: Props) {
                     <TrailingIconButton onClick={async () => {
                         await navigator.clipboard.writeText(receiver);
                         WebApp.HapticFeedback?.notificationOccurred("success")
+                        setCopied(true); setTimeout(() => setCopied(false), 1200);
                     }} style={{marginLeft: 10, border: "none"}}>
                         <img src="/copy.svg" alt="Copy"/>
+                        <CopiedBadge show={copied}>Address copied</CopiedBadge>
                     </TrailingIconButton>
                 </CardRowValue>
             </CardRow>

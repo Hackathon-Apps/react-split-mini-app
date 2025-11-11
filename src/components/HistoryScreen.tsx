@@ -10,14 +10,19 @@ import {
 } from "./styled/styled";
 import {useHistoryQuery} from "../api/queries";
 import {useTonAddress} from "@tonconnect/ui-react";
-import React from "react";
 import LoadingOverlay from "./ui/Loading";
 import {formatAddress, formatTon} from "../utils/ton";
 import {NavLink} from "react-router-dom";
+import {Pagination} from "./ui/Pagination";
+import {useState} from "react";
+
+const LIMIT = 5;
 
 export default function HistoryScreen() {
     const sender = useTonAddress();
-    const {data: history, isLoading, isError} = useHistoryQuery(sender)
+    const [page, setPage] = useState(1);
+    const {data: history, isLoading, isError} = useHistoryQuery(sender, LIMIT, LIMIT * (page - 1))
+
 
     if (isLoading) return <LoadingOverlay/>
     if (!sender) return <InfoScreen>Connect wallet to get bills history</InfoScreen>
@@ -26,7 +31,7 @@ export default function HistoryScreen() {
         <Screen>
             <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>History</div>
             <Card>
-                {history?.map((item) => (<NavLink style={{textDecoration: "none"}} to={`/history/${item.id}`} key={item.id}>
+                {history?.items?.map((item) => (<NavLink style={{textDecoration: "none"}} to={`/history/${item.id}`} key={item.id}>
                         <CardRow>
                             <HistoryItemInfo>
                                 <CardRowName>
@@ -39,10 +44,11 @@ export default function HistoryScreen() {
                             </HistoryItemInfo>
                             <CardRowValue style={{fontWeight: 400, fontSize: 18}}>{formatTon(item.amount)} TON</CardRowValue>
                         </CardRow>
-                        {item.id != history[history.length - 1].id && (<CardRowDivider/>)}
+                        {item.id != history.items[history.items.length - 1].id && (<CardRowDivider/>)}
                     </NavLink>
                 ))}
             </Card>
+            <Pagination page={page} onPageChange={setPage} pageSize={LIMIT} total={50} siblingCount={0} size={"sm"}/>
         </Screen>
     )
         ;

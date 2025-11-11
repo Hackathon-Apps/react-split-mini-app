@@ -74,21 +74,7 @@ export const PrimaryAction = styled(Button)`
     color: #ffffff !important;
     font-family: var(--fontSF), serif !important;
     font-weight: 600 !important;
-`;
-
-export const PrimaryActionLink = styled.a`
-    border-radius: 14px;
-    padding: 14px 20px;
-    font-size: 16px;
-    flex-grow: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    background-color: #2990ff !important;
-    color: #ffffff !important;
-    font-family: var(--fontSF), serif !important;
-    font-weight: 600 !important;
+    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
 `;
 
 export const IconBtn = styled.button<{ disabled?: boolean }>`
@@ -101,7 +87,8 @@ export const IconBtn = styled.button<{ disabled?: boolean }>`
     border: 1px solid #2990ff;
     color: #2990ff;
     background: #2990ff;
-    pointer-events: ${({disabled}) => (disabled ? "none" : "auto")};
+    opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
+    pointer-events: ${({disabled}) => (disabled ? "none" : "inherit")};
 `;
 
 export const HistoryHeader = styled.button<{ open?: boolean }>`
@@ -157,4 +144,14 @@ export const TrailingIconButton = styled.button`
     background: transparent;
     color: inherit;
     cursor: pointer;
+`;
+
+export const CopiedBadge = styled.div<{ show: boolean }>`
+  position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+  padding: 6px 10px; border-radius: 10px;
+  background: color-mix(in oklab, var(--text) 12%, transparent);
+  font-size: 12px; backdrop-filter: blur(6px);
+  opacity: ${(p) => (p.show ? 1 : 0)};
+  transition: opacity .18s ease;
+  pointer-events: none;
 `;

@@ -26,26 +26,27 @@
     --backdrop: rgba(0, 0, 0, .5);
 }
 
-/*@media (prefers-color-scheme: dark) {*/
-/*    :root {*/
-/*        --bg: #2f2f30;*/
-/*        --bg-secondary: #404040;*/
-/*        --text: #f2f2f2;*/
-/*        --text-secondary: #8e8e93;*/
-/*        --muted: #a7a7a7;*/
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #2f2f30;
+        --bg-secondary: #404040;
+        --text: #f2f2f2;
+        --text-secondary: #8e8e93;
+        --muted: #a7a7a7;
+        --ring-color: #404040;
 
-/*        --surface-1: #151517;*/
-/*        --surface-2: #111113;*/
-/*        --stroke: #727272;*/
-/*        --separator: #c8c7cb;*/
+        --surface-1: #151517;
+        --surface-2: #111113;
+        --stroke: #727272;
+        --separator: #c8c7cb;
 
-/*        --accent: #2990ff;*/
-/*        --accent-contrast: #ffffff;*/
-/*        --success-color: #34c759;*/
+        --accent: #2990ff;
+        --accent-contrast: #ffffff;
+        --success-color: #34c759;
 
-/*        --backdrop: rgba(0, 0, 0, .55);*/
-/*    }*/
-/*}*/
+        --backdrop: rgba(0, 0, 0, .55);
+    }
+}
 
 html, body, #root {
     min-height: 100%;

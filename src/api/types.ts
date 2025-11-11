@@ -30,6 +30,11 @@ export interface TxPayload {
     op_type: OpType;
 }
 
+export interface History {
+    items: HistoryItem[];
+    total: number;
+}
+
 export interface HistoryItem {
     id: string;
     destination_address: string;

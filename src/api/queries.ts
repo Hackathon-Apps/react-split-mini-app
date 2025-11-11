@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {CHAIN, SendTransactionResponse, useTonConnectUI} from "@tonconnect/ui-react";
+import {CHAIN, useTonConnectUI} from "@tonconnect/ui-react";
 import {http} from "./http";
-import {Bill, HistoryItem, qk, TxPayload} from "./types";
+import {Bill, History, qk, TxPayload} from "./types";
 import {toncenterBase} from "../utils/ton";
 import {Cell, fromNano, toNano} from "@ton/core";
 
@@ -15,10 +15,11 @@ export function useBillQuery(id: string, sender?: string) {
     });
 }
 
-export function useHistoryQuery(sender: string) {
+export function useHistoryQuery(sender: string, limit?: number, offset?: number) {
+    const path = `/history` + ((limit || offset)? `?limit=${limit}&offset=${offset}` : ``);
     return useQuery({
         queryKey: qk.history(sender),
-        queryFn: ({ signal }) => http.get<HistoryItem[]>(`/history`, { sender, signal }),
+        queryFn: ({ signal }) => http.get<History>(path, { sender, signal }),
     });
 }
 

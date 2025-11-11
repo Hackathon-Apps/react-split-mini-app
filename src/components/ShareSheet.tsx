@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import QRCode from "react-qr-code";
 import WebApp from "@twa-dev/sdk";
-import { Button } from "./styled/styled";
+import {Button, CopiedBadge} from "./styled/styled";
 import BottomSheet from "./ui/BottomSheet";
 
 const QrButton = styled.button`
@@ -18,16 +18,6 @@ const QrButton = styled.button`
   user-select: none;
   &:active { transform: scale(0.995); }
   & > svg { display: block; width: 240px; height: auto; }
-`;
-
-const CopiedBadge = styled.div<{ show: boolean }>`
-  position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
-  padding: 6px 10px; border-radius: 10px;
-  background: color-mix(in oklab, var(--text) 12%, transparent);
-  font-size: 12px; backdrop-filter: blur(6px);
-  opacity: ${(p) => (p.show ? 1 : 0)};
-  transition: opacity .18s ease;
-  pointer-events: none;
 `;
 
 const SendBtn = styled(Button)`

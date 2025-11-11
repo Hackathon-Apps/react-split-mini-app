@@ -65,10 +65,9 @@ export default function ProcessBill() {
     const isRefunded = bill?.status === "REFUNDED";
     const closedByStatus = bill ? bill.status === "DONE" || bill.status === "REFUNDED" : false;
     const closed = bill ? closedByStatus || leftTon === 0 || leftSec == 0 : false;
-    const showRefundAction = bill?.status === "TIMEOUT" && isCreator;
+    const showRefundAction = bill?.status === "TIMEOUT" && isCreator && bill.collected != 0;
     const showRefundedState = isRefunded && isCreator;
     const hideShare = isCreator && (showRefundAction || showRefundedState);
-    const actionsDisabled = !sender;
 
     useEffect(() => {
         if (!bill) return;
@@ -123,7 +122,7 @@ export default function ProcessBill() {
         <Screen>
             <SummaryCard>
                 <BillHero percent={percent} leftSec={leftSec} closed={closed} />
-                <Actions disabled={actionsDisabled}>
+                <Actions disabled={!sender}>
                     {showRefundAction || showRefundedState ? (
                         <PrimaryAction
                             onClick={showRefundAction ? handleRefund : undefined}
