@@ -18,7 +18,7 @@ export function useRefund(
 
         await transfer.mutateAsync({
             to: proxyWallet,
-            amountTons: 0,
+            amountTons: 0.01,
             payload,
             stateInitBase64: stateInitHash,
         });
