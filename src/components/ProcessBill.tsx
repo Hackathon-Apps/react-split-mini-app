@@ -73,13 +73,24 @@ export default function ProcessBill() {
     useEffect(() => {
         if (!bill) return;
 
-        if (bill.status === "REFUNDED" || bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT")) {
+        if (bill.status === "REFUNDED") {
+            localStorage.removeItem(LAST_BILL_KEY);
+            return;
+        }
+
+        if (bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT")) {
             localStorage.removeItem(LAST_BILL_KEY);
             return;
         }
 
         localStorage.setItem(LAST_BILL_KEY, bill.id);
     }, [bill?.id, bill?.status, isCreator]);
+
+    useEffect(() => {
+        if (isRefunded) {
+            localStorage.removeItem(LAST_BILL_KEY);
+        }
+    }, [isRefunded]);
 
     useEffect(() => {
         if (leftSec == 0 && !isCreator) {
