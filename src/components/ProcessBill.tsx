@@ -58,30 +58,34 @@ export default function ProcessBill() {
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
     const {refund, loading: refunding} = useRefund(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
 
-    const closed = bill ? leftTon === 0 || leftSec == 0 : false;
     const isCreator = useMemo(() => {
         if (!sender || !bill?.creator_address) return false;
         return sender.toLowerCase() === bill.creator_address.toLowerCase();
     }, [sender, bill?.creator_address]);
+    const isRefunded = bill?.status === "REFUNDED";
+    const closedByStatus = bill ? bill.status === "DONE" || bill.status === "REFUNDED" : false;
+    const closed = bill ? closedByStatus || leftTon === 0 || leftSec == 0 : false;
     const showRefundAction = bill?.status === "TIMEOUT" && isCreator;
-    const actionsDisabled = !sender || (!showRefundAction && closed);
+    const showRefundedState = isRefunded && isCreator;
+    const hideShare = isCreator && (showRefundAction || showRefundedState);
+    const actionsDisabled = !sender;
 
     useEffect(() => {
         if (!bill) return;
 
-        if (bill.status === "DONE" || bill.status === "TIMEOUT") {
+        if (bill.status === "REFUNDED" || bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT")) {
             localStorage.removeItem(LAST_BILL_KEY);
             return;
         }
 
         localStorage.setItem(LAST_BILL_KEY, bill.id);
-    }, [bill?.id, bill?.status]);
+    }, [bill?.id, bill?.status, isCreator]);
 
     useEffect(() => {
-        if (leftSec == 0) {
+        if (leftSec == 0 && !isCreator) {
             localStorage.removeItem(LAST_BILL_KEY);
         }
-    }, [leftSec]);
+    }, [leftSec, isCreator]);
 
     const ensureTGWallet = useEnsureTelegramWallet();
     const handlePay = async (amount: number) => {
@@ -109,18 +113,23 @@ export default function ProcessBill() {
             <SummaryCard>
                 <BillHero percent={percent} leftSec={leftSec} closed={closed} />
                 <Actions disabled={actionsDisabled}>
-                    {showRefundAction ? (
-                        <PrimaryAction onClick={handleRefund} disabled={refunding}>
-                            {refunding ? "Refunding..." : "Refund"}
+                    {showRefundAction || showRefundedState ? (
+                        <PrimaryAction
+                            onClick={showRefundAction ? handleRefund : undefined}
+                            disabled={showRefundedState || refunding}
+                        >
+                            {showRefundedState ? "Refunded" : refunding ? "Refunding..." : "Refund"}
                         </PrimaryAction>
                     ) : (
                         <PrimaryAction onClick={() => setPayOpen(true)} disabled={closed || paying}>
                             Contribute
                         </PrimaryAction>
                     )}
-                    <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
-                        <img src="/share.svg" width="20" height="20" alt="Share"/>
-                    </IconBtn>
+                    {!hideShare && (
+                        <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
+                            <img src="/share.svg" width="20" height="20" alt="Share"/>
+                        </IconBtn>
+                    )}
                 </Actions>
             </SummaryCard>
 

@@ -47,6 +47,22 @@ export function useCreateTxMutation(billId: string, sender: string) {
     });
 }
 
+export function useMarkBillRefundedMutation(billId: string, sender: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: () =>
+            http.post(
+                `/bills/${billId}/refund`,
+                undefined,
+                { sender }
+            ),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["bill"] });
+            qc.invalidateQueries({ queryKey: ["history"] });
+        },
+    });
+}
+
 type BalanceResponse =
     | { result?: string | number | { balance?: string | number } }
     | { balance?: string | number }

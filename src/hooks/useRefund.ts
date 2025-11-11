@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useCreateTxMutation, useTonTransfer } from "../api/queries";
+import { useCreateTxMutation, useMarkBillRefundedMutation, useTonTransfer } from "../api/queries";
 import { buildRefundPayload } from "../utils/ton";
 
 export function useRefund(
@@ -10,6 +10,7 @@ export function useRefund(
 ) {
     const transfer = useTonTransfer();
     const createTx = useCreateTxMutation(billId ?? "", sender ?? "");
+    const markRefunded = useMarkBillRefundedMutation(billId ?? "", sender ?? "");
 
     const refund = useCallback(async () => {
         if (!billId || !proxyWallet) throw new Error("Bill not ready");
@@ -21,9 +22,11 @@ export function useRefund(
             payload,
             stateInitBase64: stateInitHash,
         });
-    }, [billId, proxyWallet, stateInitHash, transfer, createTx]);
 
-    const loading = transfer.isLoading || createTx.isLoading;
+        await markRefunded.mutateAsync();
+    }, [billId, proxyWallet, stateInitHash, transfer, createTx, markRefunded]);
+
+    const loading = transfer.isLoading || createTx.isLoading || markRefunded.isLoading;
 
     return { refund, loading };
 }

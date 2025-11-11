@@ -8,8 +8,10 @@ function joinUrl(base: string, path: string) {
     return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+type HttpMethod = "GET" | "POST";
+
 async function request<T>(
-    method: "GET" | "POST",
+    method: HttpMethod,
     path: string,
     body?: unknown,
     opts: RequestOpts = {}
