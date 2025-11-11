@@ -17,6 +17,7 @@ import BillHero from "./ui/BillHero";
 import {useEnsureTelegramWallet} from "../hooks/useEnsureTelegramWallet";
 import LoadingOverlay from "./ui/Loading";
 import {useBillSubscription} from "../hooks/useBillSubscription";
+import {useRefund} from "../hooks/useRefund";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -54,9 +55,16 @@ export default function ProcessBill() {
         useTonBalance(wallet || undefined, network || undefined);
     const balanceText = balLoading ? "•••" : formatTon(bal?.nano ?? 0);
 
-    const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender)
+    const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
+    const {refund, loading: refunding} = useRefund(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
 
     const closed = bill ? leftTon === 0 || leftSec == 0 : false;
+    const isCreator = useMemo(() => {
+        if (!sender || !bill?.creator_address) return false;
+        return sender.toLowerCase() === bill.creator_address.toLowerCase();
+    }, [sender, bill?.creator_address]);
+    const showRefundAction = bill?.status === "TIMEOUT" && isCreator;
+    const actionsDisabled = !sender || (!showRefundAction && closed);
 
     useEffect(() => {
         if (!bill) return;
@@ -85,6 +93,14 @@ export default function ProcessBill() {
             console.error("TON transfer failed", e);
         }
     };
+    const handleRefund = async () => {
+        try {
+            await refund();
+            await ensureTGWallet();
+        } catch (e) {
+            console.error("TON refund failed", e);
+        }
+    };
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 
@@ -92,8 +108,16 @@ export default function ProcessBill() {
         <Screen>
             <SummaryCard>
                 <BillHero percent={percent} leftSec={leftSec} closed={closed} />
-                <Actions disabled={closed || !sender}>
-                    <PrimaryAction onClick={() => setPayOpen(true)} disabled={closed}>Contribute</PrimaryAction>
+                <Actions disabled={actionsDisabled}>
+                    {showRefundAction ? (
+                        <PrimaryAction onClick={handleRefund} disabled={refunding}>
+                            {refunding ? "Refunding..." : "Refund"}
+                        </PrimaryAction>
+                    ) : (
+                        <PrimaryAction onClick={() => setPayOpen(true)} disabled={closed || paying}>
+                            Contribute
+                        </PrimaryAction>
+                    )}
                     <IconBtn aria-label="Share" onClick={() => setShareOpen(true)} disabled={closed}>
                         <img src="/share.svg" width="20" height="20" alt="Share"/>
                     </IconBtn>

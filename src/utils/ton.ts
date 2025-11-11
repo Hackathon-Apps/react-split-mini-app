@@ -23,3 +23,12 @@ export function buildContributePayload(): Cell {
         .storeUint(normalizedQueryId, 64)
         .endCell();
 }
+
+export function buildRefundPayload(): Cell {
+    const normalizedQueryId = Date.now();
+
+    return beginCell()
+        .storeUint(0x61A586E5, 32)
+        .storeUint(normalizedQueryId, 64)
+        .endCell();
+}
