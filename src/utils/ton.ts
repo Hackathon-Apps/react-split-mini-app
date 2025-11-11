@@ -15,7 +15,11 @@ export function toncenterBase(chain?: CHAIN) {
 }
 
 export function buildContributePayload(): Cell {
+    // 64-bit query id helps contract deduplicate contribution messages
+    const normalizedQueryId = Date.now();
+
     return beginCell()
         .storeUint(0xCF4D2AC0, 32)
+        .storeUint(normalizedQueryId, 64)
         .endCell();
 }
