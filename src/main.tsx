@@ -6,7 +6,7 @@ import "./index.css";
 import {queryClient} from "./config/queryClient";
 import {HashRouter} from "react-router-dom";
 
-const manifestUrl = `https://tagwaiter.ru/tonconnect-manifest-new.json`;
+const manifestUrl = `https://tagwaiter.ru/tonconnect-manifest-newest.json`;
 const appUrl = "https://t.me/CryptoSplitBot?startapp"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
