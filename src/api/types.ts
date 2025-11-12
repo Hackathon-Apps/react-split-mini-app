@@ -31,7 +31,9 @@ export interface TxPayload {
 }
 
 export interface History {
-    items: HistoryItem[];
+    data: HistoryItem[];
+    page: number;
+    page_size: number;
     total: number;
 }
 

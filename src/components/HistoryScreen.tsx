@@ -16,12 +16,12 @@ import {NavLink} from "react-router-dom";
 import {Pagination} from "./ui/Pagination";
 import {useState} from "react";
 
-const LIMIT = 5;
+const PAGE_SIZE = 5;
 
 export default function HistoryScreen() {
     const sender = useTonAddress();
     const [page, setPage] = useState(1);
-    const {data: history, isLoading, isError} = useHistoryQuery(sender, LIMIT, LIMIT * (page - 1))
+    const {data: history, isLoading, isError} = useHistoryQuery(sender, PAGE_SIZE, page)
 
 
     if (isLoading) return <LoadingOverlay/>
@@ -31,7 +31,7 @@ export default function HistoryScreen() {
         <Screen>
             <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>History</div>
             <Card>
-                {history?.items?.map((item) => (<NavLink style={{textDecoration: "none"}} to={`/history/${item.id}`} key={item.id}>
+                {history?.data?.map((item) => (<NavLink style={{textDecoration: "none"}} to={`/history/${item.id}`} key={item.id}>
                         <CardRow>
                             <HistoryItemInfo>
                                 <CardRowName>
@@ -44,11 +44,11 @@ export default function HistoryScreen() {
                             </HistoryItemInfo>
                             <CardRowValue style={{fontWeight: 400, fontSize: 18}}>{formatTon(item.amount)} TON</CardRowValue>
                         </CardRow>
-                        {item.id != history.items[history.items.length - 1].id && (<CardRowDivider/>)}
+                        {item.id != history.data[history.data.length - 1].id && (<CardRowDivider/>)}
                     </NavLink>
                 ))}
             </Card>
-            <Pagination page={page} onPageChange={setPage} pageSize={LIMIT} total={50} siblingCount={0} size={"sm"}/>
+            <Pagination page={page} onPageChange={setPage} pageSize={PAGE_SIZE} total={history?.total} siblingCount={0} size={"sm"}/>
         </Screen>
     )
         ;

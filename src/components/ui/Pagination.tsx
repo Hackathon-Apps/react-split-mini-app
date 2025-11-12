@@ -79,21 +79,21 @@ const sizeStyles = {
         min-width: 32px;
         height: 32px;
         padding: 0 8px;
-        font-size: 12px;
+        font-size: 14px;
         border-radius: 20px;
     `,
     md: css`
         min-width: 36px;
         height: 36px;
         padding: 0 12px;
-        font-size: 14px;
+        font-size: 16px;
         border-radius: 24px;
     `,
     lg: css`
         min-width: 40px;
         height: 40px;
         padding: 0 16px;
-        font-size: 16px;
+        font-size: 18px;
         border-radius: 28px;
     `,
 } as const;
