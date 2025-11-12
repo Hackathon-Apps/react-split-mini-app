@@ -48,5 +48,5 @@ export interface HistoryItem {
 // Удобные ключи для RQ
 export const qk = {
     bill: (id: string, sender?: string) => ["bill", id, sender] as const,
-    history: (sender?: string) => ["history", sender] as const,
+    history: (pageSize: number, page: number, sender?: string) => ["history", pageSize, page, sender] as const,
 };

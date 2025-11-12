@@ -29,7 +29,7 @@ export default function HistoryScreen() {
     if (isError || history?.total == 0) return <InfoScreen>No transactions</InfoScreen>
     return (
         <Screen>
-            <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>History</div>
+            <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>Bills History</div>
             <Card>
                 {history?.data?.map((item) => (<NavLink style={{textDecoration: "none"}} to={`/history/${item.id}`} key={item.id}>
                         <CardRow>
@@ -48,7 +48,7 @@ export default function HistoryScreen() {
                     </NavLink>
                 ))}
             </Card>
-            <Pagination page={page} onPageChange={setPage} pageSize={PAGE_SIZE} total={history?.total} siblingCount={0} size={"sm"}/>
+            <Pagination page={page} onPageChange={setPage} pageSize={PAGE_SIZE} total={history?.total} siblingCount={0} showFirstLast={false} size={"sm"}/>
         </Screen>
     )
         ;

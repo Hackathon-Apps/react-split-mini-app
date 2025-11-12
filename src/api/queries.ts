@@ -15,10 +15,10 @@ export function useBillQuery(id: string, sender?: string) {
     });
 }
 
-export function useHistoryQuery(sender: string, page_size?: number, page?: number) {
+export function useHistoryQuery(sender: string, page_size: number, page: number) {
     const path = `/history?page=${page}&page_size=${page_size}`;
     return useQuery({
-        queryKey: qk.history(sender),
+        queryKey: qk.history(page_size, page, sender),
         queryFn: ({ signal }) => http.get<History>(path, { sender, signal }),
     });
 }
