@@ -77,7 +77,7 @@ export default function ProcessBill() {
             return;
         }
 
-        if (bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT") || (bill.collected === 0)) {
+        if (bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT") || (bill.status === "TIMEOUT" && bill.collected === 0)) {
             localStorage.removeItem(LAST_BILL_KEY);
             return;
         }
