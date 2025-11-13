@@ -20,7 +20,7 @@ export default function HistoryScreen() {
 
     if (isLoading) return <LoadingOverlay/>
     if (!sender) return <InfoScreen>Connect wallet to get bills history</InfoScreen>
-    if (isError) return <InfoScreen>No transactions</InfoScreen>
+    if (isError || history.length == 0) return <InfoScreen>No transactions</InfoScreen>
     return (
         <Screen>
             <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>Bills History</div>
