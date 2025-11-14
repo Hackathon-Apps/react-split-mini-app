@@ -271,7 +271,7 @@ export function CreateBill() {
                         <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
                     </ScanButton>
                 </Row>
-                {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
+                {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
             </Field>
             <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
                 If the goal is not achieved within 10 minutes, the funds will be returned back.
