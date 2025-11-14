@@ -104,9 +104,15 @@ const ScanButton = styled(TrailingIconButton)`
     color: #2990FF;
 `;
 
-const ErrorText = styled.small`
+const ErrorText = styled.small<{visible?: boolean}>`
     color: #ff4d4f;
     padding-left: 6px;
+    display: block;
+    min-height: 18px;
+    margin-top: ${(p) => (p.visible ? 4 : 0)}px;
+    opacity: ${(p) => (p.visible ? 1 : 0)};
+    visibility: ${(p) => (p.visible ? "visible" : "hidden")};
+    transition: opacity 0.15s ease;
 `;
 
 const Footer = styled.div`
@@ -255,7 +261,13 @@ export function CreateBill() {
                         <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol"/>
                     </TonBadge>
                 </Row>
-                {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
+                <ErrorText
+                    visible={totalInvalid}
+                    aria-live="polite"
+                    aria-hidden={totalInvalid ? undefined : true}
+                >
+                    Min amount is 0.1 TON
+                </ErrorText>
             </Field>
 
             <Field invalid={receiverInvalid}>
@@ -271,7 +283,13 @@ export function CreateBill() {
                         <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
                     </ScanButton>
                 </Row>
-                {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
+                <ErrorText
+                    visible={receiverInvalid}
+                    aria-live="polite"
+                    aria-hidden={receiverInvalid ? undefined : true}
+                >
+                    Enter address belonging to TON
+                </ErrorText>
             </Field>
             <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
                 If the goal is not achieved within 10 minutes, the funds will be returned back.
