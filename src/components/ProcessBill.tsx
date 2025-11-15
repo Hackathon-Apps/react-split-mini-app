@@ -7,7 +7,7 @@ import {useTonConnect} from "../hooks/useTonConnect";
 import {useBillQuery, useTonBalance} from "../api/queries";
 import {formatTon} from "../utils/ton";
 import {useTonAddress} from "@tonconnect/ui-react";
-import {useNavigate, useParams, useSearchParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {fromNano} from "@ton/core";
 import BillTransactions from "./ui/BillTransactions";
 import {useBillCountdown} from "../hooks/useBillCountDown";
@@ -22,14 +22,7 @@ import {useRefund} from "../hooks/useRefund";
 const LAST_BILL_KEY = "lastBillId";
 
 export default function ProcessBill() {
-    const navigate = useNavigate();
-    const {id} = useParams<{ id?: string, created_at: string }>();
-    const [searchParams, _] = useSearchParams();
-    const created_at = searchParams.get("created_at");
-
-    useEffect(() => {
-        if (created_at && (Date.parse(created_at) / 1000 + 600 - Date.now() / 1000) < 0) navigate("/join/timeout");
-    }, [created_at, navigate]);
+    const {id} = useParams<{ id?: string }>();
     const {wallet, network} = useTonConnect();
     const sender = useTonAddress();
 
@@ -43,8 +36,8 @@ export default function ProcessBill() {
     );
     const leftTon = bill ? Math.max(0, bill.goal - bill.collected) : 0;
     const url = useMemo(
-        () => buildMiniAppLink("CryptoSplitBot", {id: bill?.id, created_at: bill?.created_at, tab: "bills"}),
-        [bill?.id, bill?.created_at]
+        () => buildMiniAppLink("CryptoSplitBot", bill?.id),
+        [bill?.id]
     );
 
     const [shareOpen, setShareOpen] = useState(false);

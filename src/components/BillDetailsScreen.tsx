@@ -12,7 +12,7 @@ import {useBillSubscription} from "../hooks/useBillSubscription";
 import WebApp from "@twa-dev/sdk";
 
 export default function BillDetailsScreen() {
-    const {id} = useParams<{ id?: string, created_at: string }>();
+    const {id} = useParams<{ id?: string }>();
 
     const {data: bill, isLoading} = useBillQuery(id as string);
     useBillSubscription(id);
@@ -22,7 +22,7 @@ export default function BillDetailsScreen() {
         [bill?.goal, bill?.collected]
     );
     const url = useMemo(
-        () => buildMiniAppLink("CryptoSplitBot", {id: bill?.id, tab: "bills"}),
+        () => buildMiniAppLink("CryptoSplitBot", bill?.id),
         [bill?.id]
     );
 

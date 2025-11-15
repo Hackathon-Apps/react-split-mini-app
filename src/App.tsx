@@ -7,13 +7,15 @@ import {useEffect, useMemo, useRef} from "react";
 import HistoryScreen from "./components/HistoryScreen";
 import WebApp from "@twa-dev/sdk";
 import {UIStateProvider} from "./state/uiState";
-import {readStartPayload} from "./utils/deeplink";
+import {readStartBillId} from "./utils/deeplink";
 import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import JoinScreen from "./components/JoinScreen";
 import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
+import {http} from "./api/http";
+import {Bill} from "./api/types";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -53,17 +55,29 @@ function RootLayout() {
 
         WebApp.ready();
 
-        // читаем диплинк-пейлоад при старте
-        const payload = readStartPayload<{ id: string; created_at?: number; tab: string}>();
-        if (payload) {
-            const q = payload.created_at ? `?created_at=${payload.created_at}` : "";
-            navigate(`/${payload.tab}/${payload.id}${q}`, { replace: true });
+        const billId = readStartBillId();
+        const controller = new AbortController();
+        if (billId) {
+            (async () => {
+                try {
+                    const bill = await http.get<Bill>(`/bills/${billId}`, { signal: controller.signal });
+                    if (bill.status === "TIMEOUT") {
+                        navigate("/join/timeout", { replace: true });
+                        return;
+                    }
+                    navigate(`/bills/${billId}`, { replace: true });
+                } catch (err) {
+                    if (controller.signal.aborted) return;
+                    console.error("Failed to preload bill", err);
+                    navigate(`/bills/${billId}`, { replace: true });
+                }
+            })();
         }
 
-        // чистим ?tgWebAppStartParam, чтобы при F5 не повторялся старт
         const url = new URL(window.location.href);
         url.searchParams.delete("tgWebAppStartParam");
         window.history.replaceState({}, "", url);
+        return () => controller.abort();
     }, [navigate]);
 
     return (
@@ -73,15 +87,12 @@ function RootLayout() {
                     <HeaderRow>
                         <TonConnectButton />
                     </HeaderRow>
-
-                    {/* сюда рендерятся экраны */}
                     <Outlet />
                 </AppContainer>
 
                 <BottomTabBar
                     active={activeTab}
                     onChange={(tab) => {
-                        // навигация вкладок
                         if (tab === "bills") navigate("/bills");
                         if (tab === "join") navigate("/join");
                         if (tab === "history") navigate("/history");
