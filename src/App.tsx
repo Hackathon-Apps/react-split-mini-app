@@ -14,8 +14,6 @@ import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
-import {http} from "./api/http";
-import {Bill} from "./api/types";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -56,28 +54,13 @@ function RootLayout() {
         WebApp.ready();
 
         const billId = readStartBillId();
-        const controller = new AbortController();
         if (billId) {
-            (async () => {
-                try {
-                    const bill = await http.get<Bill>(`/bills/${billId}`, { signal: controller.signal });
-                    if (bill.status === "TIMEOUT") {
-                        navigate("/join/timeout", { replace: true });
-                        return;
-                    }
-                    navigate(`/bills/${billId}`, { replace: true });
-                } catch (err) {
-                    if (controller.signal.aborted) return;
-                    console.error("Failed to preload bill", err);
-                    navigate(`/bills/${billId}`, { replace: true });
-                }
-            })();
+            navigate(`/bills/${billId}`, { replace: true });
         }
 
         const url = new URL(window.location.href);
         url.searchParams.delete("tgWebAppStartParam");
         window.history.replaceState({}, "", url);
-        return () => controller.abort();
     }, [navigate]);
 
     return (

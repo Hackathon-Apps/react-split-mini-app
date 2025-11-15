@@ -7,7 +7,7 @@ import {useTonConnect} from "../hooks/useTonConnect";
 import {useBillQuery, useTonBalance} from "../api/queries";
 import {formatTon} from "../utils/ton";
 import {useTonAddress} from "@tonconnect/ui-react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {fromNano} from "@ton/core";
 import BillTransactions from "./ui/BillTransactions";
 import {useBillCountdown} from "../hooks/useBillCountDown";
@@ -22,6 +22,7 @@ import {useRefund} from "../hooks/useRefund";
 const LAST_BILL_KEY = "lastBillId";
 
 export default function ProcessBill() {
+    const navigate = useNavigate();
     const {id} = useParams<{ id?: string }>();
     const {wallet, network} = useTonConnect();
     const sender = useTonAddress();
@@ -61,6 +62,13 @@ export default function ProcessBill() {
     const showRefundAction = bill?.status === "TIMEOUT" && isCreator && bill.collected != 0;
     const showRefundedState = isRefunded && isCreator;
     const hideShare = isCreator && (showRefundAction || showRefundedState);
+
+    useEffect(() => {
+        if (!bill) return;
+        if (bill.status === "TIMEOUT") {
+            navigate("/join/timeout", { replace: true });
+        }
+    }, [bill?.status, navigate]);
 
     useEffect(() => {
         if (!bill) return;
