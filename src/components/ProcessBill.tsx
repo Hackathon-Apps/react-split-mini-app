@@ -65,10 +65,10 @@ export default function ProcessBill() {
 
     useEffect(() => {
         if (!bill) return;
-        if (bill.status === "TIMEOUT") {
+        if (bill.status === "TIMEOUT" && !isCreator) {
             navigate("/join/timeout", { replace: true });
         }
-    }, [bill?.status, navigate]);
+    }, [bill?.status, navigate, isCreator]);
 
     useEffect(() => {
         if (!bill) return;
