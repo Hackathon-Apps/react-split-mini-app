@@ -14,6 +14,7 @@ import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
+import telegramAnalytics from '@telegram-apps/analytics';
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -35,6 +36,16 @@ const HeaderRow = styled.div`
   /* tighten spacing so Connect button remains visible without scroll */
   margin: 12px 0 12px;
 `;
+
+const tgAnalyticsToken = import.meta.env.TELEGRAM_ANALYTICS_TOKEN;
+const tgAnalyticsAppName = import.meta.env.TELEGRAM_ANALYTICS_APP_NAME;
+
+if (tgAnalyticsToken && tgAnalyticsAppName) {
+    telegramAnalytics.init({
+        token: tgAnalyticsToken,
+        appName: tgAnalyticsAppName,
+    });
+}
 
 function RootLayout() {
     const navigate = useNavigate();

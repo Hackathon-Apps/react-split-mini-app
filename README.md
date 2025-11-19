@@ -43,6 +43,22 @@ The project is highly-opinionated, and there are many other alternate routes it 
 1. Run `npm run dev` and edit the code as needed
 2. On push to the `main` branch, the app will be automatically deployed via github actions.
 
+## Telegram Analytics
+
+Telegram Analytics requires a token and app identifier. Supply them through the standard Vite environment mechanism so the secrets never land in the codebase:
+
+1. Create an `.env.local` file (ignored by git) in the project root.
+2. Add the credentials you get from [Telegram Analytics](https://analytics.telegram.org/) in the following format:
+
+   ```bash
+   VITE_TELEGRAM_ANALYTICS_TOKEN=your_token_here
+   VITE_TELEGRAM_ANALYTICS_APP_NAME=your_app_identifier
+   ```
+
+3. Restart the dev server/build so the variables are picked up.
+
+When both variables are present the app will automatically call `telegramAnalytics.init(...)` during startup; in other environments (e.g. local demos) analytics stays disabled.
+
 # Roadmap
 
 - [ ] Jetton transfer support
