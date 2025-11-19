@@ -37,8 +37,8 @@ const HeaderRow = styled.div`
   margin: 12px 0 12px;
 `;
 
-const tgAnalyticsToken = import.meta.env.TELEGRAM_ANALYTICS_TOKEN;
-const tgAnalyticsAppName = import.meta.env.TELEGRAM_ANALYTICS_APP_NAME;
+const tgAnalyticsToken = import.meta.env.VITE_TELEGRAM_ANALYTICS_TOKEN;
+const tgAnalyticsAppName = import.meta.env.VITE_TELEGRAM_ANALYTICS_APP_NAME;
 
 if (tgAnalyticsToken && tgAnalyticsAppName) {
     telegramAnalytics.init({
