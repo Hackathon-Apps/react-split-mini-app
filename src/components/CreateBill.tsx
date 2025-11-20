@@ -43,7 +43,6 @@ const Legend = styled.legend`
 const Row = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
 `;
 
 const Input = styled.input`
@@ -94,7 +93,7 @@ const PasteButton = styled.button`
     font-size: 16px;
     cursor: pointer;
     padding: 0 6px;
-    height: 44px;
+    height: 29px;
     display: inline-flex;
     align-items: center;
 `;
