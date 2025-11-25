@@ -34,34 +34,35 @@ const Row = styled.div`
 `;
 
 const Input = styled.input`
-    flex: 1;
-    padding: 10px 8px;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    outline: none;
-    font-size: 16px; /* prevent iOS auto-zoom */
+  flex: 1;
+  line-height: 1;
+  padding: 10px 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  font-size: 16px; /* prevent iOS auto-zoom */
 
-    /* Hide number input spinners on all browsers */
+  /* Hide number input spinners on all browsers */
 
-    &[type="number"] {
-        -moz-appearance: textfield; /* Firefox */
-        appearance: textfield;
-    }
+  &[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield;
+  }
 
-    &[type="number"]::-webkit-outer-spin-button,
-    &[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none; /* Chrome, Safari, Edge */
-        margin: 0;
-    }
+  &[type="number"]::-webkit-outer-spin-button,
+  &[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    margin: 0;
+  }
 
-    &::placeholder {
-        color: #888;
-        opacity: 1;
-        font-family: var(--fontRoboto), serif;
-        font-weight: 600;
-        font-size: 16px;
-    }
+  &::placeholder {
+    color: #888;
+    opacity: 1;
+    font-family: var(--fontRoboto), serif;
+    font-weight: 600;
+    font-size: 16px;
+  }
 `;
 
 const TonBadge = styled.div`
