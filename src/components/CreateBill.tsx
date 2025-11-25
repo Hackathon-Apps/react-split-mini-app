@@ -35,15 +35,17 @@ const Row = styled.div`
 
 const Input = styled.input`
   flex: 1;
-  line-height: 1;
+  box-sizing: border-box;
+  height: 36px;
   padding: 10px 8px;
   border: 0;
   background: transparent;
   color: inherit;
   outline: none;
-  font-size: 16px; /* prevent iOS auto-zoom */
-
-  /* Hide number input spinners on all browsers */
+  font-size: 16px;
+  line-height: 1.2;
+  -webkit-appearance: none;
+  border-radius: 0;
 
   &[type="number"] {
     -moz-appearance: textfield; /* Firefox */
@@ -52,7 +54,7 @@ const Input = styled.input`
 
   &[type="number"]::-webkit-outer-spin-button,
   &[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    -webkit-appearance: none;   /* Chrome, Safari, Edge */
     margin: 0;
   }
 
