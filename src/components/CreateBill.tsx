@@ -10,10 +10,12 @@ import {toNano} from "@ton/core";
 import {useNavigate} from "react-router-dom";
 
 const Field = styled.fieldset<{ invalid?: boolean }>`
-    padding: 6px 12px 10px;
-    border-radius: 20px;
-    border: 3px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
-    background: transparent;
+  padding: 6px 12px 10px;
+  border-radius: 20px;
+  border: 3px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
+  background: transparent;
+  box-sizing: border-box;
+  height: 66px;
 `;
 
 const Legend = styled.legend<{ invalid?: boolean}>`
@@ -21,7 +23,7 @@ const Legend = styled.legend<{ invalid?: boolean}>`
     padding: 0 6px;
     opacity: 0.9;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 16px;
     font-family: var(--fontRoboto), serif;
     line-height: 1;
     margin-left: 4px;
