@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import {Address} from "@ton/ton";
-import {Button, InfoScreen, TrailingIconButton} from "./styled/styled";
+import {Screen, Button, InfoScreen, TrailingIconButton} from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import {useUIState} from "../state/uiState";
 import {useTonAddress} from "@tonconnect/ui-react";
@@ -9,27 +9,15 @@ import {useCreateBillMutation} from "../api/queries";
 import {toNano} from "@ton/core";
 import {useNavigate} from "react-router-dom";
 
-const Screen = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    max-width: 900px;
-    margin: 0 auto;
-    /* Keep content height stable even when the keyboard is visible */
-    min-height: calc(var(--tg-viewport-stable-height, 100svh) - 160px);
-`;
-
 const Field = styled.fieldset<{ invalid?: boolean }>`
-    margin: 5px 20px;
     padding: 6px 12px 10px;
     border-radius: 20px;
     border: 3px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
     background: transparent;
-
 `;
 
-const Legend = styled.legend`
-    color: var(--input);
+const Legend = styled.legend<{ invalid?: boolean}>`
+    color: ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
     padding: 0 6px;
     opacity: 0.9;
     font-weight: 600;
@@ -105,11 +93,7 @@ const ScanButton = styled(TrailingIconButton)`
 
 const ErrorText = styled.small`
     color: #ff4d4f;
-    padding-left: 6px;
-`;
-
-const Footer = styled.div`
-    height: 96px; /* reduced to avoid extra scroll while keeping CTA clear */
+    padding-left: 24px;
 `;
 
 const FixedCtaWrap = styled.div<{ hidden?: boolean }>`
@@ -239,7 +223,7 @@ export function CreateBill() {
     return (
         <Screen>
             <Field invalid={totalInvalid}>
-                <Legend>Bill</Legend>
+                <Legend invalid={totalInvalid}>Bill</Legend>
                 <Row>
                     <Input
                         type="number"
@@ -254,11 +238,11 @@ export function CreateBill() {
                         <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol"/>
                     </TonBadge>
                 </Row>
-                {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
             </Field>
+            {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
 
             <Field invalid={receiverInvalid}>
-                <Legend>Receiver</Legend>
+                <Legend invalid={receiverInvalid}>Receiver</Legend>
                 <Row>
                     <Input
                         placeholder="TON address"
@@ -270,12 +254,11 @@ export function CreateBill() {
                         <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
                     </ScanButton>
                 </Row>
-                {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
             </Field>
+            {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
             <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
                 If the goal is not achieved within 10 minutes, the funds will be returned back.
             </InfoScreen>
-            <Footer/>
 
             <FixedCtaWrap hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>
                 <FixedCtaInner>

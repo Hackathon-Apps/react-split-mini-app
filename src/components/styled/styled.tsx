@@ -41,12 +41,14 @@ export const CardEmpty = styled.div`
 `;
 
 export const Screen = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 16px 100px; /* leave space for bottom bar */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 100px; /* leave space for bottom bar */
 `;
 
 export const SummaryCard = styled.div`
