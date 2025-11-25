@@ -8,32 +8,7 @@ import {useTonAddress} from "@tonconnect/ui-react";
 import {useCreateBillMutation} from "../api/queries";
 import {toNano} from "@ton/core";
 import {useNavigate} from "react-router-dom";
-
-const Field = styled.fieldset<{ invalid?: boolean }>`
-  padding: 6px 12px 10px;
-  border-radius: 20px;
-  border: 3px solid ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
-  background: transparent;
-  box-sizing: border-box;
-  height: 66px;
-`;
-
-const Legend = styled.legend<{ invalid?: boolean}>`
-    color: ${(p) => (p.invalid ? "#ff4d4f" : "var(--input)")};
-    padding: 0 6px;
-    opacity: 0.9;
-    font-weight: 600;
-    font-size: 16px;
-    font-family: var(--fontRoboto), serif;
-    line-height: 1;
-    margin-left: 4px;
-    margin-bottom: -4px; /* tighten gap to input */
-`;
-
-const Row = styled.div`
-    display: flex;
-    align-items: center;
-`;
+import {FormField} from "./ui/FormField";
 
 const Input = styled.input`
   flex: 1;
@@ -56,7 +31,7 @@ const Input = styled.input`
 
   &[type="number"]::-webkit-outer-spin-button,
   &[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;   /* Chrome, Safari, Edge */
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
     margin: 0;
   }
 
@@ -70,70 +45,65 @@ const Input = styled.input`
 `;
 
 const TonBadge = styled.div`
-    width: 29px;
-    height: 29px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  width: 29px;
+  height: 29px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const PasteButton = styled.button`
-    border: 0;
-    background: transparent;
-    color: #2990FF;
-    font-weight: 600;
-    font-family: var(--fontSF), serif;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 0 6px;
-    height: 29px;
-    display: inline-flex;
-    align-items: center;
+  border: 0;
+  background: transparent;
+  color: #2990FF;
+  font-weight: 600;
+  font-family: var(--fontSF), serif;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 6px;
+  height: 29px;
+  display: inline-flex;
+  align-items: center;
 `;
 
 const ScanButton = styled(TrailingIconButton)`
-    border-color: #2990FF;
-    color: #2990FF;
-`;
-
-const ErrorText = styled.small`
-    color: #ff4d4f;
-    padding-left: 24px;
+  border-color: #2990FF;
+  color: #2990FF;
 `;
 
 const FixedCtaWrap = styled.div<{ hidden?: boolean }>`
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: calc(var(--bottom-bar-height, 88px) + 24px + env(safe-area-inset-bottom));
-    display: flex;
-    justify-content: center;
-    padding: 0 16px;
-    z-index: 900; /* below tab bar (1000), above content */
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    transform: ${(p) => (p.hidden ? "translateY(140%)" : "translateY(0)")};
-    opacity: ${(p) => (p.hidden ? 0 : 1)};
-    pointer-events: ${(p) => (p.hidden ? "none" : "auto")};
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bottom-bar-height, 88px) + 24px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 900; /* below tab bar (1000), above content */
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: ${(p) => (p.hidden ? "translateY(140%)" : "translateY(0)")};
+  opacity: ${(p) => (p.hidden ? 0 : 1)};
+  pointer-events: ${(p) => (p.hidden ? "none" : "auto")};
 `;
 
 const FixedCtaInner = styled.div`
-    width: min(900px, 92%);
+  width: min(900px, 92%);
 `;
 
 const PrimaryAction = styled(Button)`
-    width: 100%;
-    border-radius: 16px;
-    padding: 14px 20px;
-    font-size: 16px;
-    background-color: #2990FF !important;
-    color: #FFFFFF !important;
-    font-family: var(--fontSF), serif !important;
-    font-weight: 600 !important;
+  width: 100%;
+  border-radius: 16px;
+  padding: 14px 20px;
+  font-size: 16px;
+  background-color: #2990FF !important;
+  color: #FFFFFF !important;
+  font-family: var(--fontSF), serif !important;
+  font-weight: 600 !important;
 
-    &:disabled {
-        opacity: 0.6;
-        pointer-events: none;
-    }
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 `;
 
 const LAST_BILL_KEY = "lastBillId";
@@ -149,11 +119,10 @@ export function CreateBill() {
     // восстановить последний id, если есть
     useEffect(() => {
         const last = localStorage.getItem(LAST_BILL_KEY);
-        if (last) navigate(`/bills/${last}`, { replace: true });
+        if (last) navigate(`/bills/${last}`, {replace: true});
     }, [navigate]);
 
     const onScan = useCallback(() => {
-        // Telegram WebApp QR scanner. Fallback: prompt paste
         try {
             WebApp.showScanQrPopup({text: "Scan TON address"}, (data) => {
                 if (data) {
@@ -169,11 +138,9 @@ export function CreateBill() {
 
     const onPaste = useCallback(async () => {
         try {
-            const anyWebApp: any = WebApp as any;
-            if (anyWebApp?.readTextFromClipboard) {
-                const text = await anyWebApp.readTextFromClipboard();
+            WebApp.readTextFromClipboard((text) => {
                 if (text) return setReceiver(String(text).trim());
-            }
+            });
         } catch {
         }
         try {
@@ -219,48 +186,46 @@ export function CreateBill() {
             });
             localStorage.setItem(LAST_BILL_KEY, res.id);
             navigate(`/bills/${res.id}`, {replace: true});
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
         }
     }
 
     return (
         <Screen>
-            <Field invalid={totalInvalid}>
-                <Legend invalid={totalInvalid}>Bill</Legend>
-                <Row>
-                    <Input
-                        type="number"
-                        inputMode="decimal"
-                        placeholder="Total amount"
-                        value={total}
-                        onChange={(e) => setTotal(e.target.value)}
-                        min={0}
-                        step="0.01"
-                    />
-                    <TonBadge>
-                        <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol"/>
-                    </TonBadge>
-                </Row>
-            </Field>
-            {totalInvalid && <ErrorText>Min amount is 0.1 TON</ErrorText>}
-
-            <Field invalid={receiverInvalid}>
-                <Legend invalid={receiverInvalid}>Receiver</Legend>
-                <Row>
-                    <Input
-                        placeholder="TON address"
-                        value={receiver}
-                        onChange={(e) => setReceiver(e.target.value)}
-                    />
-                    <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
-                    <ScanButton type="button" onClick={onScan} aria-label="Scan">
-                        <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
-                    </ScanButton>
-                </Row>
-            </Field>
-            {receiverInvalid && <ErrorText>Enter address belonging to TON</ErrorText>}
+            <FormField
+                label="Bill"
+                invalid={totalInvalid}
+                error="Min amount is 0.1 TON"
+            >
+                <Input
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="Total amount"
+                    value={total}
+                    onChange={(e) => setTotal(e.target.value)}
+                    min={0}
+                    step="0.01"
+                />
+                <TonBadge>
+                    <img src="/ton_symbol.png" width="29" height="29" alt="TON symbol"/>
+                </TonBadge>
+            </FormField>
+            <FormField
+                label="Receiver"
+                invalid={receiverInvalid}
+                error="Enter address belonging to TON"
+            >
+                <Input
+                    placeholder="TON address"
+                    value={receiver}
+                    onChange={(e) => setReceiver(e.target.value)}
+                />
+                <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
+                <ScanButton type="button" onClick={onScan} aria-label="Scan">
+                    <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
+                </ScanButton>
+            </FormField>
             <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
                 If the goal is not achieved within 10 minutes, the funds will be returned back.
             </InfoScreen>
