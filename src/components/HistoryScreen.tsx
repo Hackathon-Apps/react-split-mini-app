@@ -18,9 +18,10 @@ export default function HistoryScreen() {
     const sender = useTonAddress();
     const {data: history, isLoading, isError} = useHistoryQuery(sender)
 
-    if (isLoading) return <LoadingOverlay/>
     if (!sender) return <InfoScreen>Connect wallet to get bills history</InfoScreen>
-    if (isError || history.length == 0) return <InfoScreen>No transactions</InfoScreen>
+    if (isLoading) return <LoadingOverlay/>
+    if (!history || history.length == 0) return <InfoScreen>No transactions</InfoScreen>
+    if (isError) return <InfoScreen>Unable to load transactions</InfoScreen>
     return (
         <Screen>
             <div style={{padding: 6, marginLeft: 24, color: "var(--text-secondary)", fontSize: 18}}>Bills History</div>

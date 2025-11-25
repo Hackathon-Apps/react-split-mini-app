@@ -26,7 +26,7 @@ export function useContribute(
             amount: amountTons,
             op_type: "CONTRIBUTE",
         });
-    }, [billId, proxyWallet, transfer, createTx]);
+    }, [billId, proxyWallet, transfer, createTx, stateInitHash]);
 
     const loading = transfer.isLoading || createTx.isLoading;
 

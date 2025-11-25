@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {Fragment, useEffect, useRef, useState} from "react";
 import type {Transaction} from "../../api/types";
 import {formatAddress, formatTon} from "../../utils/ton";
 import {
@@ -49,8 +49,8 @@ export default function BillTransactions({transactions, defaultOpen = false}: Pr
                         <CardEmpty>No transactions</CardEmpty>
                     ) : (
                         transactions.map((t) => (
-                            <>
-                                <CardRow key={t.id}>
+                            <Fragment key={t.id}>
+                                <CardRow>
                                     <HistoryItemInfo>
                                         <CardRowName>
                                             {new Date(t.created_at).toLocaleString()}
@@ -65,7 +65,7 @@ export default function BillTransactions({transactions, defaultOpen = false}: Pr
                                     </CardRowValue>
                                 </CardRow>
                                 {t.id != transactions[transactions.length - 1].id && (<CardRowDivider/>)}
-                            </>
+                            </Fragment>
                         )))}
                 </HistoryBodyInner>
             </HistoryBodyOuter>

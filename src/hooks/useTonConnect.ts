@@ -10,6 +10,7 @@ export function useTonConnect(): {
 } {
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
+  const nowSec = Math.floor(Date.now() / 1000);
 
   return {
     sender: {
@@ -27,7 +28,7 @@ export function useTonConnect(): {
                     stateInit: stateInitBoc,
                 },
             ],
-            validUntil: Date.now() + 5 * 60 * 1000, // 5 minutes for user to approve
+            validUntil: nowSec + 10 * 60, // 5 minutes for user to approve
         });
       },
     },

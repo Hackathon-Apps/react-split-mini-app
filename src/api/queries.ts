@@ -19,6 +19,7 @@ export function useHistoryQuery(sender: string) {
     return useQuery({
         queryKey: qk.history(sender),
         queryFn: ({ signal }) => http.get<HistoryItem[]>(path, { sender, signal }),
+        enabled: !!sender,
     });
 }
 

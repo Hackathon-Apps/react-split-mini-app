@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useCreateTxMutation, useMarkBillRefundedMutation, useTonTransfer } from "../api/queries";
+import { useMarkBillRefundedMutation, useTonTransfer } from "../api/queries";
 import { buildRefundPayload } from "../utils/ton";
 
 export function useRefund(
@@ -9,7 +9,6 @@ export function useRefund(
     sender: string | undefined
 ) {
     const transfer = useTonTransfer();
-    const createTx = useCreateTxMutation(billId ?? "", sender ?? "");
     const markRefunded = useMarkBillRefundedMutation(billId ?? "", sender ?? "");
 
     const refund = useCallback(async () => {
@@ -24,9 +23,9 @@ export function useRefund(
         });
 
         await markRefunded.mutateAsync();
-    }, [billId, proxyWallet, stateInitHash, transfer, createTx, markRefunded]);
+    }, [billId, proxyWallet, stateInitHash, transfer, markRefunded]);
 
-    const loading = transfer.isLoading || createTx.isLoading || markRefunded.isLoading;
+    const loading = transfer.isLoading || markRefunded.isLoading;
 
     return { refund, loading };
 }
