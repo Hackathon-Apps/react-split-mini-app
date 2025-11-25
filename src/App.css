@@ -50,7 +50,6 @@
 
 html, body, #root {
     min-height: 100%;
-    overflow: hidden;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     background: var(--bg);
