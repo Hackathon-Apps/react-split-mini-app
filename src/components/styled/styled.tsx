@@ -37,7 +37,7 @@ export const CardRowValue = styled.span<{accent?: boolean}>`
     color: ${({accent}) => (accent ? "var(--accent)" : "var(--text)")};
 `;
 export const CardEmpty = styled.div`
-  opacity: 0.6; text-align: center; padding: 12px 0;
+  opacity: 0.6; text-align: center; padding: 6px 0;
 `;
 
 export const Screen = styled.div`
@@ -96,7 +96,7 @@ export const HistoryHeader = styled.button<{ open?: boolean }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
+    padding: 16px 14px;
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -154,4 +154,13 @@ export const CopiedBadge = styled.div<{ show: boolean }>`
   opacity: ${(p) => (p.show ? 1 : 0)};
   transition: opacity .18s ease;
   pointer-events: none;
+`;
+
+export const SecondaryButton = styled(Button)<{ danger?: boolean}>`
+    border-radius: 16px;
+    font-size: 16px;
+    padding: 16px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    color: ${props => `var(${props.danger? "--danger" : "--accent"})`};
 `;

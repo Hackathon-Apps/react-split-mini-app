@@ -1,10 +1,10 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Screen, Actions, IconBtn, PrimaryAction, SummaryCard} from "./styled/styled";
+import {Screen, Actions, IconBtn, PrimaryAction, SummaryCard, SecondaryButton} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
 import {useTonConnect} from "../hooks/useTonConnect";
-import {useBillQuery, useTonBalance} from "../api/queries";
+import {useBillQuery, useCancelBillMutation, useTonBalance} from "../api/queries";
 import {formatTon} from "../utils/ton";
 import {useTonAddress} from "@tonconnect/ui-react";
 import {useNavigate, useParams} from "react-router-dom";
@@ -18,6 +18,7 @@ import {useEnsureTelegramWallet} from "../hooks/useEnsureTelegramWallet";
 import LoadingOverlay from "./ui/Loading";
 import {useBillSubscription} from "../hooks/useBillSubscription";
 import {useRefund} from "../hooks/useRefund";
+import WebApp from "@twa-dev/sdk";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -51,12 +52,14 @@ export default function ProcessBill() {
 
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
     const {refund, loading: refunding} = useRefund(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
+    const cancelBill = useCancelBillMutation(bill!.id, sender)
 
     const isCreator = useMemo(() => {
         if (!sender || !bill?.creator_address) return false;
         return sender.toLowerCase() === bill.creator_address.toLowerCase();
     }, [sender, bill?.creator_address]);
     const isRefunded = bill?.status === "REFUNDED";
+
     const closedByStatus = bill ? bill.status === "DONE" || bill.status === "REFUNDED" : false;
     const closed = bill ? closedByStatus || leftTon === 0 || leftSec == 0 : false;
     const showRefundAction = bill?.status === "TIMEOUT" && isCreator && bill.collected != 0;
@@ -73,30 +76,17 @@ export default function ProcessBill() {
     useEffect(() => {
         if (!bill) return;
 
-        if (bill.status === "REFUNDED") {
-            localStorage.removeItem(LAST_BILL_KEY);
-            return;
-        }
-
-        if (bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT") || (bill.status === "TIMEOUT" && bill.collected === 0)) {
+        if (bill.status === "DONE"
+            || (!isCreator && bill.status === "TIMEOUT")
+            || (bill.status === "TIMEOUT" && bill.collected === 0)
+            || bill.status === "REFUNDED"
+        ) {
             localStorage.removeItem(LAST_BILL_KEY);
             return;
         }
 
         localStorage.setItem(LAST_BILL_KEY, bill.id);
     }, [bill?.id, bill?.status, isCreator]);
-
-    useEffect(() => {
-        if (isRefunded) {
-            localStorage.removeItem(LAST_BILL_KEY);
-        }
-    }, [isRefunded]);
-
-    useEffect(() => {
-        if (leftSec == 0 && !isCreator) {
-            localStorage.removeItem(LAST_BILL_KEY);
-        }
-    }, [leftSec, isCreator]);
 
     const ensureTGWallet = useEnsureTelegramWallet();
     const handlePay = async (amount: number) => {
@@ -116,6 +106,16 @@ export default function ProcessBill() {
             console.error("TON refund failed", e);
         }
     };
+
+    const handleCancel = async () => {
+        try {
+            await cancelBill.mutateAsync();
+            localStorage.removeItem(LAST_BILL_KEY);
+            navigate("/bills");
+        } catch (e) {
+            console.error("Bill cancelling failed");
+        }
+    }
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 
@@ -147,6 +147,9 @@ export default function ProcessBill() {
             <BillStats collected={bill.collected} goal={bill.goal} receiver={bill.destination_address} left={leftTon}/>
 
             <BillTransactions transactions={bill.transactions} />
+
+            <SecondaryButton>Send tips</SecondaryButton>
+            <SecondaryButton danger={true} onClick={()=>WebApp.showConfirm("Cancel bill?", handleCancel)}>Cancel bill</SecondaryButton>
 
             <ShareSheet open={shareOpen} url={url} onClose={() => setShareOpen(false)}
                         shareText="Split the bill with me"/>
