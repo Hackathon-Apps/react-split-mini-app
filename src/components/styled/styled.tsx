@@ -77,6 +77,10 @@ export const PrimaryAction = styled(Button)`
     opacity: ${({disabled}) => (disabled ? 0.5 : 1)};
 `;
 
+export const DangerAction = styled(PrimaryAction)`
+    background-color: #f36446 !important;
+`;
+
 export const IconBtn = styled.button<{ disabled?: boolean }>`
     width: 50px;
     height: 50px;

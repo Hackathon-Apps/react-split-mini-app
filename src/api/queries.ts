@@ -62,6 +62,24 @@ export function useMarkBillRefundedMutation(billId: string, sender: string) {
     });
 }
 
+export function useCancelBillMutation(billId?: string, sender?: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: () => {
+            if (!billId) throw new Error("Bill id is required");
+            return http.post(
+                `/bills/${billId}/cancel`,
+                undefined,
+                { sender }
+            );
+        },
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["bill"] });
+            qc.invalidateQueries({ queryKey: ["history"] });
+        },
+    });
+}
+
 type BalanceResponse =
     | { result?: string | number | { balance?: string | number } }
     | { balance?: string | number }

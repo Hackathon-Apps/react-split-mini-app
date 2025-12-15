@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Screen, Actions, IconBtn, PrimaryAction, SummaryCard} from "./styled/styled";
+import {Screen, Actions, IconBtn, PrimaryAction, SummaryCard, DangerAction} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
@@ -18,6 +18,7 @@ import {useEnsureTelegramWallet} from "../hooks/useEnsureTelegramWallet";
 import LoadingOverlay from "./ui/Loading";
 import {useBillSubscription} from "../hooks/useBillSubscription";
 import {useRefund} from "../hooks/useRefund";
+import {useCancelBillMutation} from "../api/queries";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -51,17 +52,19 @@ export default function ProcessBill() {
 
     const {contribute, loading: paying} = useContribute(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
     const {refund, loading: refunding} = useRefund(bill?.id, bill?.proxy_wallet, bill?.state_init_hash, sender);
+    const {mutateAsync: cancelBill, isLoading: canceling} = useCancelBillMutation(bill?.id, sender);
 
     const isCreator = useMemo(() => {
         if (!sender || !bill?.creator_address) return false;
         return sender.toLowerCase() === bill.creator_address.toLowerCase();
     }, [sender, bill?.creator_address]);
     const isRefunded = bill?.status === "REFUNDED";
-    const closedByStatus = bill ? bill.status === "DONE" || bill.status === "REFUNDED" : false;
+    const closedByStatus = bill ? bill.status !== "ACTIVE" : false;
     const closed = bill ? closedByStatus || leftTon === 0 || leftSec == 0 : false;
     const showRefundAction = bill?.status === "TIMEOUT" && isCreator && bill.collected != 0;
     const showRefundedState = isRefunded && isCreator;
     const hideShare = isCreator && (showRefundAction || showRefundedState);
+    const showCancelAction = isCreator && bill?.status === "ACTIVE" && !closed;
 
     useEffect(() => {
         if (!bill) return;
@@ -73,12 +76,11 @@ export default function ProcessBill() {
     useEffect(() => {
         if (!bill) return;
 
-        if (bill.status === "REFUNDED") {
-            localStorage.removeItem(LAST_BILL_KEY);
-            return;
-        }
+        const keepLastBill =
+            bill.status === "ACTIVE" ||
+            (bill.status === "TIMEOUT" && isCreator && bill.collected !== 0);
 
-        if (bill.status === "DONE" || (!isCreator && bill.status === "TIMEOUT") || (bill.status === "TIMEOUT" && bill.collected === 0)) {
+        if (!keepLastBill) {
             localStorage.removeItem(LAST_BILL_KEY);
             return;
         }
@@ -108,7 +110,7 @@ export default function ProcessBill() {
             console.error("TON transfer failed", e);
         }
     };
-    const handleRefund = async () => {
+    const runRefund = async () => {
         try {
             await refund();
             await ensureTGWallet();
@@ -116,6 +118,22 @@ export default function ProcessBill() {
             console.error("TON refund failed", e);
         }
     };
+    const handleRefund = async () => {
+        await runRefund();
+    };
+    const handleCancel = async () => {
+        if (!bill?.id) return;
+        try {
+            await cancelBill();
+            if (bill.collected > 0) {
+                await runRefund();
+            }
+        } catch (e) {
+            console.error("Cancel bill failed", e);
+        }
+    };
+
+    const cancelProcessing = canceling || refunding;
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 
@@ -147,6 +165,17 @@ export default function ProcessBill() {
             <BillStats collected={bill.collected} goal={bill.goal} receiver={bill.destination_address} left={leftTon}/>
 
             <BillTransactions transactions={bill.transactions} />
+
+            {showCancelAction && (
+                <Actions>
+                    <DangerAction
+                        onClick={handleCancel}
+                        disabled={cancelProcessing}
+                    >
+                        {canceling ? "Cancelling..." : refunding ? "Refunding..." : "Cancel"}
+                    </DangerAction>
+                </Actions>
+            )}
 
             <ShareSheet open={shareOpen} url={url} onClose={() => setShareOpen(false)}
                         shareText="Split the bill with me"/>
