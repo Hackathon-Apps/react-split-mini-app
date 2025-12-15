@@ -14,6 +14,8 @@ import CreateBill from "./components/CreateBill";
 import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
+import WelcomeScreen from "./components/WelcomeScreen";
+import { ONBOARDING_SEEN_KEY } from "./constants";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -39,12 +41,14 @@ const HeaderRow = styled.div`
 function RootLayout() {
     const navigate = useNavigate();
     const routerLocation = useLocation();
+    const startBillIdRef = useRef<string | null>(readStartBillId());
 
     const activeTab: TabKey = useMemo(() => {
         if (routerLocation.pathname.startsWith("/history")) return "history";
         if (routerLocation.pathname.startsWith("/join")) return "join";
         return "bills";
     }, [routerLocation.pathname]);
+    const isOnboarding = routerLocation.pathname === "/welcome";
 
     const handledRef = useRef(false);
     useEffect(() => {
@@ -53,7 +57,7 @@ function RootLayout() {
 
         WebApp.ready();
 
-        const billId = readStartBillId();
+        const billId = startBillIdRef.current;
         if (billId) {
             navigate(`/bills/${billId}`, { replace: true });
         }
@@ -63,24 +67,35 @@ function RootLayout() {
         window.history.replaceState({}, "", url);
     }, [navigate]);
 
+    useEffect(() => {
+        const hasSeenOnboarding = localStorage.getItem(ONBOARDING_SEEN_KEY) === "1";
+        if (!hasSeenOnboarding && !startBillIdRef.current && routerLocation.pathname === "/bills") {
+            navigate("/welcome", { replace: true });
+        }
+    }, [navigate, routerLocation.pathname]);
+
     return (
         <UIStateProvider>
             <StyledApp>
                 <AppContainer>
-                    <HeaderRow>
-                        <TonConnectButton />
-                    </HeaderRow>
+                    {!isOnboarding && (
+                        <HeaderRow>
+                            <TonConnectButton />
+                        </HeaderRow>
+                    )}
                     <Outlet />
                 </AppContainer>
 
-                <BottomTabBar
-                    active={activeTab}
-                    onChange={(tab) => {
-                        if (tab === "bills") navigate("/bills");
-                        if (tab === "join") navigate("/join");
-                        if (tab === "history") navigate("/history");
-                    }}
-                />
+                {!isOnboarding && (
+                    <BottomTabBar
+                        active={activeTab}
+                        onChange={(tab) => {
+                            if (tab === "bills") navigate("/bills");
+                            if (tab === "join") navigate("/join");
+                            if (tab === "history") navigate("/history");
+                        }}
+                    />
+                )}
             </StyledApp>
         </UIStateProvider>
     );
@@ -91,6 +106,7 @@ export default function App() {
         <Routes>
             <Route element={<RootLayout />}>
                 <Route index element={<Navigate to="/bills" replace />} />
+                <Route path="/welcome" element={<WelcomeScreen />} />
                 <Route path="/bills" element={<CreateBill />} />
                 <Route path="/bills/:id" element={<ProcessBill />} />
                 <Route path="/join" element={<JoinScreen />} />
