@@ -257,6 +257,6 @@ export default function ProcessBill() {
 const InfoNote = styled.div`
     text-align: center;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.4;
 `;
