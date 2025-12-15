@@ -159,3 +159,67 @@ export const CopiedBadge = styled.div<{ show: boolean }>`
   transition: opacity .18s ease;
   pointer-events: none;
 `;
+
+export const ConfirmOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1200;
+`;
+
+export const ConfirmCard = styled.div`
+  width: min(440px, 100%);
+  border-radius: 18px;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+export const ConfirmTitle = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+`;
+
+export const ConfirmText = styled.div`
+  color: #4a4a4a;
+  line-height: 1.4;
+  font-size: 14px;
+`;
+
+export const ConfirmActions = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+`;
+
+export const ConfirmButton = styled.button<{ variant: "yes" | "no" }>`
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  background: ${(p) => (p.variant === "yes" ? "#b6b6b6" : "#2990ff")};
+  color: #ffffff;
+  transition: transform .12s ease, opacity .12s ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;

@@ -1,5 +1,18 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Screen, Actions, IconBtn, PrimaryAction, SummaryCard, DangerAction} from "./styled/styled";
+import {
+    Screen,
+    Actions,
+    IconBtn,
+    PrimaryAction,
+    SummaryCard,
+    DangerAction,
+    ConfirmOverlay,
+    ConfirmCard,
+    ConfirmTitle,
+    ConfirmText,
+    ConfirmActions,
+    ConfirmButton
+} from "./styled/styled";
 import {buildMiniAppLink} from "../utils/deeplink";
 import ShareSheet from "./ShareSheet";
 import PaySheet from "./PaySheet";
@@ -19,6 +32,7 @@ import LoadingOverlay from "./ui/Loading";
 import {useBillSubscription} from "../hooks/useBillSubscription";
 import {useRefund} from "../hooks/useRefund";
 import {useCancelBillMutation} from "../api/queries";
+import styled from "styled-components";
 
 const LAST_BILL_KEY = "lastBillId";
 
@@ -45,6 +59,7 @@ export default function ProcessBill() {
     const [shareOpen, setShareOpen] = useState(false);
     const [payOpen, setPayOpen] = useState(false);
     const [amount, setAmount] = useState(0);
+    const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
     const {data: bal, isLoading: balLoading} =
         useTonBalance(wallet || undefined, network || undefined);
@@ -133,7 +148,23 @@ export default function ProcessBill() {
         }
     };
 
+    const handleConfirmCancel = async () => {
+        if (cancelProcessing) return;
+        setConfirmCancelOpen(false);
+        await handleCancel();
+    };
+
     const cancelProcessing = canceling || refunding;
+
+    useEffect(() => {
+        if (!confirmCancelOpen) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setConfirmCancelOpen(false);
+        };
+
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [confirmCancelOpen]);
 
     if (isLoading || !bill) return <LoadingOverlay/>;
 
@@ -162,6 +193,8 @@ export default function ProcessBill() {
                 </Actions>
             </SummaryCard>
 
+            <InfoNote>Any excess funds will be returned back to the creator</InfoNote>
+
             <BillStats collected={bill.collected} goal={bill.goal} receiver={bill.destination_address} left={leftTon}/>
 
             <BillTransactions transactions={bill.transactions} />
@@ -169,7 +202,7 @@ export default function ProcessBill() {
             {showCancelAction && (
                 <Actions>
                     <DangerAction
-                        onClick={handleCancel}
+                        onClick={() => setConfirmCancelOpen(true)}
                         disabled={cancelProcessing}
                     >
                         {canceling ? "Cancelling..." : refunding ? "Refunding..." : "Cancel"}
@@ -188,6 +221,42 @@ export default function ProcessBill() {
                 onPay={handlePay}
                 balanceTon={balanceText}
             />
+            {confirmCancelOpen && (
+                <ConfirmOverlay onClick={() => !cancelProcessing && setConfirmCancelOpen(false)}>
+                    <ConfirmCard
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Cancel bill confirmation"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <ConfirmTitle>Cancel this bill?</ConfirmTitle>
+                        <ConfirmText>All funds will be returned to each sender.</ConfirmText>
+                        <ConfirmActions>
+                            <ConfirmButton
+                                variant="yes"
+                                onClick={handleConfirmCancel}
+                                disabled={cancelProcessing}
+                            >
+                                Yes
+                            </ConfirmButton>
+                            <ConfirmButton
+                                variant="no"
+                                onClick={() => setConfirmCancelOpen(false)}
+                                disabled={cancelProcessing}
+                            >
+                                No
+                            </ConfirmButton>
+                        </ConfirmActions>
+                    </ConfirmCard>
+                </ConfirmOverlay>
+            )}
         </Screen>
     );
 }
+
+const InfoNote = styled.div`
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.4;
+`;

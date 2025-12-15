@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import {Address} from "@ton/ton";
-import {Screen, Button, InfoScreen, TrailingIconButton} from "./styled/styled";
+import {Screen, Button, TrailingIconButton} from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import {useUIState} from "../state/uiState";
 import {useTonAddress} from "@tonconnect/ui-react";
@@ -104,6 +104,14 @@ const PrimaryAction = styled(Button)`
     opacity: 0.6;
     pointer-events: none;
   }
+`;
+
+const CtaNote = styled.div`
+  margin-top: 8px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
 `;
 
 const LAST_BILL_KEY = "lastBillId";
@@ -216,25 +224,22 @@ export function CreateBill() {
                 invalid={receiverInvalid}
                 error="Enter address belonging to TON"
             >
-                <Input
-                    placeholder="TON address"
-                    value={receiver}
-                    onChange={(e) => setReceiver(e.target.value)}
-                />
-                <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
-                <ScanButton type="button" onClick={onScan} aria-label="Scan">
-                    <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
-                </ScanButton>
-            </FormField>
-            <InfoScreen style={{minHeight: "40vh", fontSize: 12, padding: 36, color: "var(--text-secondary)"}}>
-                If the goal is not achieved within 10 minutes, the funds will be returned back.
-            </InfoScreen>
-
+            <Input
+                placeholder="TON address"
+                value={receiver}
+                onChange={(e) => setReceiver(e.target.value)}
+            />
+            <PasteButton type="button" onClick={onPaste}>Paste</PasteButton>
+            <ScanButton type="button" onClick={onScan} aria-label="Scan">
+                <img src="/qr.svg" width="16" height="16" alt="Scan QR"/>
+            </ScanButton>
+        </FormField>
             <FixedCtaWrap hidden={isEditing || isModalOpen} aria-hidden={(isEditing || isModalOpen) ? true : undefined}>
                 <FixedCtaInner>
                     <PrimaryAction onClick={handleCreate} disabled={!canCreate}>
                         Create
                     </PrimaryAction>
+                    <CtaNote>If the goal is not achieved within 10 minutes, the funds will be returned back.</CtaNote>
                 </FixedCtaInner>
             </FixedCtaWrap>
         </Screen>
