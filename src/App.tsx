@@ -15,7 +15,6 @@ import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
 import WelcomeScreen from "./components/WelcomeScreen";
-import { ONBOARDING_SEEN_KEY } from "./constants";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -68,8 +67,7 @@ function RootLayout() {
     }, [navigate]);
 
     useEffect(() => {
-        const hasSeenOnboarding = localStorage.getItem(ONBOARDING_SEEN_KEY) === "1";
-        if (!hasSeenOnboarding && !startBillIdRef.current && routerLocation.pathname === "/bills") {
+        if (!startBillIdRef.current && routerLocation.pathname === "/bills") {
             navigate("/welcome", { replace: true });
         }
     }, [navigate, routerLocation.pathname]);
