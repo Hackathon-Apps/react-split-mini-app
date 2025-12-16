@@ -1,6 +1,7 @@
 import React, {Fragment, useEffect, useRef, useState} from "react";
 import type {Transaction} from "../../api/types";
 import {formatAddress, formatTon} from "../../utils/ton";
+import {formatTime} from "../../utils/date";
 import {
     Card,
     CardEmpty,
@@ -53,7 +54,7 @@ export default function BillTransactions({transactions, defaultOpen = false}: Pr
                                 <CardRow>
                                     <HistoryItemInfo>
                                         <CardRowName>
-                                            {new Date(t.created_at).toLocaleString()}
+                                            {formatTime(t.created_at)}
                                         </CardRowName>
                                         <CardRowValue style={{
                                             fontWeight: 400,

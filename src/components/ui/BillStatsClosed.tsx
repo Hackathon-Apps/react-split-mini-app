@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {formatAddress, formatTon} from "../../utils/ton";
+import {formatDateTime} from "../../utils/date";
 import {Card, CardRow, CardRowName, CardRowValue, CopiedBadge, TrailingIconButton} from "../styled/styled";
 import WebApp from "@twa-dev/sdk";
 
@@ -19,8 +20,8 @@ export default function BillStatsClosed({collected, goal, receiver, created_at, 
                 <CardRow><CardRowName>Goal</CardRowName><CardRowValue>{formatTon(goal)} TON</CardRowValue></CardRow>
             </Card>
             <Card>
-                <CardRow><CardRowName>Started</CardRowName><CardRowValue>{new Date(created_at).toLocaleString()}</CardRowValue></CardRow>
-                <CardRow><CardRowName>Ended</CardRowName><CardRowValue>{new Date(closed_at ?? (Date.parse(created_at) + 600000)).toLocaleString()}</CardRowValue></CardRow>
+                <CardRow><CardRowName>Started</CardRowName><CardRowValue>{formatDateTime(created_at)}</CardRowValue></CardRow>
+                <CardRow><CardRowName>Ended</CardRowName><CardRowValue>{formatDateTime(closed_at ?? (Date.parse(created_at) + 600000))}</CardRowValue></CardRow>
             </Card>
             <Card>
                 <CardRow>

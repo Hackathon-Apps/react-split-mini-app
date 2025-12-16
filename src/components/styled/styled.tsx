@@ -104,7 +104,7 @@ export const HistoryHeader = styled.button<{ open?: boolean }>`
     background: transparent;
     border: 0;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: color-mix(in oklab, var(--text) 65%, transparent);
 
     & > span {
         font-weight: 400;
@@ -128,6 +128,13 @@ export const HistoryItemInfo = styled.div`
     display: flex;
     flex-direction: column;
 `
+
+export const HistoryGroupTitle = styled.div`
+    padding: 6px 14px 0;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 16px;
+`;
 
 export const InfoScreen = styled.div`
     justify-content: center;
