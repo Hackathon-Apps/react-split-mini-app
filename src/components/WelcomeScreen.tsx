@@ -102,7 +102,7 @@ export default function WelcomeScreen() {
         <Steps>
           <Step>
             <StepIcon src="/bill.svg" alt="Bill icon" />
-            Create a bill by setting up the Goal and Reciever TON address
+            Create a bill with Goal and Reciever's TON address
           </Step>
           <Step>
             <StepIcon src="/qr.svg" alt="QR icon" />
