@@ -33,8 +33,7 @@ import {useBillSubscription} from "../hooks/useBillSubscription";
 import {useRefund} from "../hooks/useRefund";
 import {useCancelBillMutation} from "../api/queries";
 import styled from "styled-components";
-
-const LAST_BILL_KEY = "lastBillId";
+import {LAST_BILL_KEY} from "../constants";
 
 export default function ProcessBill() {
     const navigate = useNavigate();

@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import WebApp from "@twa-dev/sdk";
 import { useNavigate } from "react-router-dom";
+import {WELCOME_SESSION_KEY} from "../constants";
 
 const Wrapper = styled.div`
   min-height: calc(var(--tg-viewport-stable-height, 100svh));
@@ -83,6 +84,7 @@ export default function WelcomeScreen() {
 
   const handleStart = useCallback(() => {
     WebApp.HapticFeedback?.impactOccurred("light");
+    sessionStorage.setItem(WELCOME_SESSION_KEY, "1");
     navigate("/bills", { replace: true });
   }, [navigate]);
 
@@ -100,7 +102,7 @@ export default function WelcomeScreen() {
         <Steps>
           <Step>
             <StepIcon src="/bill.svg" alt="Bill icon" />
-            Create a bill by setting up the goal and reciever TON address
+            Create a bill by setting up the Goal and Reciever TON address
           </Step>
           <Step>
             <StepIcon src="/qr.svg" alt="QR icon" />

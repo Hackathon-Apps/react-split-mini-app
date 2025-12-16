@@ -15,6 +15,7 @@ import ProcessBill from "./components/ProcessBill";
 import JoinTimeOutScreen from "./components/JoinTimeOutScreen";
 import BillDetailsScreen from "./components/BillDetailsScreen";
 import WelcomeScreen from "./components/WelcomeScreen";
+import {LAST_BILL_KEY, WELCOME_SESSION_KEY} from "./constants";
 
 const StyledApp = styled.div`
   background-color: var(--bg);
@@ -67,10 +68,33 @@ function RootLayout() {
     }, [navigate]);
 
     useEffect(() => {
-        if (!startBillIdRef.current && routerLocation.pathname === "/bills") {
+        const clearWelcomeSession = () => sessionStorage.removeItem(WELCOME_SESSION_KEY);
+        window.addEventListener("beforeunload", clearWelcomeSession);
+        window.addEventListener("pagehide", clearWelcomeSession);
+        return () => {
+            window.removeEventListener("beforeunload", clearWelcomeSession);
+            window.removeEventListener("pagehide", clearWelcomeSession);
+            clearWelcomeSession();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (routerLocation.pathname !== "/bills") return;
+
+        const hasActiveBill = !!localStorage.getItem(LAST_BILL_KEY);
+        const skipWelcomeThisSession = sessionStorage.getItem(WELCOME_SESSION_KEY) === "1";
+
+        if (!startBillIdRef.current && !hasActiveBill && !skipWelcomeThisSession) {
             navigate("/welcome", { replace: true });
         }
     }, [navigate, routerLocation.pathname]);
+
+    useEffect(() => {
+        WebApp.enableClosingConfirmation();
+        return () => {
+            WebApp.disableClosingConfirmation?.();
+        };
+    }, []);
 
     return (
         <UIStateProvider>

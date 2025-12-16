@@ -9,6 +9,7 @@ import {useCreateBillMutation} from "../api/queries";
 import {toNano} from "@ton/core";
 import {useNavigate} from "react-router-dom";
 import {FormField} from "./ui/FormField";
+import {LAST_BILL_KEY} from "../constants";
 
 const Input = styled.input`
   flex: 1;
@@ -113,8 +114,6 @@ const CtaNote = styled.div`
   font-size: 12px;
   line-height: 1.4;
 `;
-
-const LAST_BILL_KEY = "lastBillId";
 
 export function CreateBill() {
     const [total, setTotal] = useState("");
