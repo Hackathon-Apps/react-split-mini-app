@@ -201,7 +201,7 @@ export function CreateBill() {
     return (
         <Screen>
             <FormField
-                label="Bill"
+                label="Goal"
                 invalid={totalInvalid}
                 error="Min amount is 0.1 TON"
             >
