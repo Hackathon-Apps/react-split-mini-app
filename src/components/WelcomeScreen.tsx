@@ -32,7 +32,7 @@ const Preview = styled.img`
 `;
 
 const Title = styled.h1`
-  margin: 30px 0 10px;
+  margin: 25px 0 5px;
   font-size: 20px;
   color: var(--text);
 `;
@@ -65,7 +65,7 @@ const StepIcon = styled.img`
 
 const StartButton = styled.button`
   width: 60%;
-  margin-top: 30px;
+  margin-top: 25px;
   border: 0;
   border-radius: 20px;
   padding: 14px 12px;
