@@ -101,15 +101,15 @@ export default function WelcomeScreen() {
         </div>
         <Steps>
           <Step>
-            <StepIcon src="/bill.svg" alt="Bill icon" />
+            <StepIcon src="/bill-active.svg" alt="Bill icon" />
             Create a bill with Goal and Reciever's TON address
           </Step>
           <Step>
-            <StepIcon src="/qr.svg" alt="QR icon" />
+            <StepIcon src="/qr-active.svg" alt="QR icon" />
             Join by QR or link from friends
           </Step>
           <Step>
-            <StepIcon src="/clock.svg" alt="Clock icon" />
+            <StepIcon src="/clock-active.svg" alt="Clock icon" />
             Track bills history
           </Step>
         </Steps>
