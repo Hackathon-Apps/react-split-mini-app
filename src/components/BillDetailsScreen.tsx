@@ -35,6 +35,7 @@ export default function BillDetailsScreen() {
         <Screen>
             <SummaryCard>
                 <BillHero percent={percent} leftSec={0} closed={true}/>
+                init_data: {WebApp.initData}
             </SummaryCard>
 
             <BillStatsClosed collected={bill.collected} goal={bill.goal}
